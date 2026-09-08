@@ -1,0 +1,26 @@
+﻿SkillId,SkillName,SkillCategory,SkillType
+SK001,Microsoft Fabric,データ基盤,技術
+SK002,Azure Databricks,データ基盤,技術
+SK003,Power BI,BI/可視化,技術
+SK004,Azure OpenAI / 生成AI,AI,技術
+SK005,RAGアーキテクチャ設計,AI,技術
+SK006,機械学習モデル開発,AI,技術
+SK007,Azure インフラ設計,クラウド,技術
+SK008,Kubernetes / AKS,クラウド,技術
+SK009,SAP S/4HANA,業務パッケージ,技術
+SK010,Salesforce,業務パッケージ,技術
+SK011,Python,開発言語,技術
+SK012,Java,開発言語,技術
+SK013,TypeScript / React,開発言語,技術
+SK014,データモデリング,データ基盤,技術
+SK015,データガバナンス / Purview,データ基盤,技術
+SK016,要件定義,業務,業務
+SK017,プロジェクトマネジメント,業務,業務
+SK018,アーキテクチャ設計,業務,業務
+SK019,業務コンサルティング,業務,業務
+SK020,セキュリティ設計,セキュリティ,技術
+SK021,製造業務知識(生産管理),業界知識,業界
+SK022,金融業務知識(勘定系),業界知識,業界
+SK023,流通業務知識(SCM),業界知識,業界
+SK024,公共業務知識(自治体),業界知識,業界
+SK025,英語(ビジネス),語学,その他

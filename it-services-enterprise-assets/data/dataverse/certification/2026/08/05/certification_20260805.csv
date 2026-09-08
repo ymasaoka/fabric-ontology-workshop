@@ -1,0 +1,9 @@
+﻿CertificationId,CertificationName,Issuer,Domain
+CT01,Microsoft Certified: Fabric Analytics Engineer Associate,Microsoft,データ基盤
+CT02,Microsoft Certified: Azure Solutions Architect Expert,Microsoft,クラウド
+CT03,Microsoft Certified: Azure AI Engineer Associate,Microsoft,AI
+CT04,Databricks Certified Data Engineer Professional,Databricks,データ基盤
+CT05,PMP,PMI,PM
+CT06,情報処理安全確保支援士,IPA,セキュリティ
+CT07,Microsoft Certified: Azure Data Engineer Associate,Microsoft,データ基盤
+CT08,AWS Certified Solutions Architect – Professional,AWS,クラウド

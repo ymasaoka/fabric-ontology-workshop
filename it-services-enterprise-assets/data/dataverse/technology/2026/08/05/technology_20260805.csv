@@ -1,0 +1,13 @@
+﻿TechnologyId,TechnologyName,Vendor,TechnologyCategory
+TC01,Microsoft Fabric,Microsoft,データ基盤
+TC02,Azure Databricks,Microsoft/Databricks,データ基盤
+TC03,Azure OpenAI Service,Microsoft,AI
+TC04,Azure AI Search,Microsoft,AI
+TC05,Power BI,Microsoft,BI/可視化
+TC06,Azure Kubernetes Service,Microsoft,クラウド
+TC07,SAP S/4HANA,SAP,業務パッケージ
+TC08,Salesforce Sales Cloud,Salesforce,業務パッケージ
+TC09,Microsoft Purview,Microsoft,ガバナンス
+TC10,Snowflake,Snowflake,データ基盤
+TC11,Dynamics 365,Microsoft,業務パッケージ
+TC12,Azure Synapse Analytics,Microsoft,データ基盤
