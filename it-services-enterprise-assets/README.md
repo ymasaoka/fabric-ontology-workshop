@@ -28,6 +28,8 @@ _(English version follows bellow)_
 
 試用版容量の制約については、以下を参照ください。  
 
+https://learn.microsoft.com/ja-jp/fabric/fundamentals/fabric-trial#whats-includedand-whats-not
+
 ### テナント設定
 
 Fabric でオントロジーの機能を利用するためには、テナント設定にて指定の項目を有効化する必要があります。
