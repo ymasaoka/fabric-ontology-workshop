@@ -18,17 +18,17 @@ Microsoft Fabric のオントロジーは、MCP (Model Context Protocol) に対�
 
 Microsoft Fabric における、オントロジー MCP サーバーのエンドポイント URL 形式は以下となっています。
 
-> https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/<workspace-ID>/items/<ontology-item-ID>/ontologyEndpoint
+> https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/{workspace-ID}/items/{ontology-item-ID}/ontologyEndpoint
 
 また、上記に加え、Agent 365 Gateway を経由したオントロジー MCP サーバーのエンドポイントも存在します。
 
-> https://agent365.svc.cloud.microsoft/agents/tenants/<tenant_id>/servers/mcp_FabricIQOntology/workspaces/<workspace-ID>/ontologies/<ontology-item-ID>
+> https://agent365.svc.cloud.microsoft/agents/tenants/{tenant_id}/servers/mcp_FabricIQOntology/workspaces/{workspace-ID}/ontologies/{ontology-item-ID}
 
 `workspace-ID` および `ontology-item-ID` は、環境ごとに一意の値となります。この 2 つの ID 値を確認し、エンドポイント URL を完成させる形となります。  
 
 1. 作成済みのワークスペース画面を開き、`ont_its_asset` を開きます。 
 2. ブラウザーのアドレスバーの URL を取得します。以下のような形になっているはずです。  
-  > https://app.fabric.microsoft.com/groups/<workspace-ID>/ontologies/<ontology-item-ID>?experience=fabric-developer
+  > https://app.fabric.microsoft.com/groups/{workspace-ID}/ontologies/{ontology-item-ID}?experience=fabric-developer
 3. `workspace-ID` と `ontology-item-ID` の位置にある値 (GUID) をメモ帳などに控えてください。  
 
 Agent 365 Gateway 対応版の場合は、加えて `tenant_Id` も必要となります。こちらは、Entra ID のテナント ID の値となります。
@@ -43,9 +43,9 @@ https://code.visualstudio.com/docs/agent-customization/mcp-servers
 2. **HTTP (HTTP またはサーバ送信イベント)** を選択します。
 3. サーバーの URL に、前述のオントロジー MCP サーバーのエンドポイントを入力します。
   `workspace-ID` と `ontology-item-ID` は取得したものに置き換えてください。
-  > https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/<workspace-ID>/items/<ontology-item-ID>/ontologyEndpoint
+  > https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/{workspace-ID}/items/{ontology-item-ID}/ontologyEndpoint
   または
-  > https://agent365.svc.cloud.microsoft/agents/tenants/<tenant_id>/servers/mcp_FabricIQOntology/workspaces/<workspace-ID>/ontologies/<ontology-item-ID>
+  > https://agent365.svc.cloud.microsoft/agents/tenants/{tenant_id}/servers/mcp_FabricIQOntology/workspaces/{workspace-ID}/ontologies/{ontology-item-ID}
 4. MCP ID を入力します。これは識別するための表示名なので、任意の名前を入力します。(`fabric-iq-ontology-its-asset` など)
 5. インストール先で `グローバル` または `ワークスペース` のどちらかを選択します。特に何もなければグローバルを選択します。  
 6. `mcp.json` ファイル画面が開き、新しく追加したオントロジー MCP の設定情報が確認できます。
