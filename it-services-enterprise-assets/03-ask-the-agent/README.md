@@ -353,4 +353,6 @@ MCP を利用すれば、同じオントロジーを複数の AI エージェン
 | 症状 | 原因として多いもの | 対処 |
 |---|---|---|
 | オントロジー MCP の URL もアカウント認証も適切だが認証がエラー | Microsoft Edge の認証プロファイルにより認証先テナントが誤認識されてしまう | Microsoft Edge の既定プロファイルを認証で使用するものに変更して認証を再実施 |
-| オントロジー MCP の検索が失敗する | エンティティが見つからず search_ontology が失敗する | Microsoft Foundry Agent で Fabric IQ のツールを使用して再実施 |
+| 検索が失敗する | エンティティが見つからず search_ontology が失敗する | Microsoft Foundry Agent など別のツールを使用して再実施 |
+| 検索が失敗する | Fabric compute capacity has exceeded its limit と出る | Fabric 容量を上位のものに切り替え |
+| 検索結果が 0 件になる | オントロジーに紐づくグラフデータベースの更新ができていない | nb_03_build_ontology にてグラフデータベースの取り込みが正常に完了しているか確認する |
