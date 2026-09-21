@@ -1,4 +1,4 @@
-_(English version follows bellow)_
+_(English version follows below)_
 
 # IT Services Enterprise Assets
 
@@ -98,4 +98,96 @@ https://learn.microsoft.com/ja-jp/fabric/data-science/data-agent-tenant-settings
 
 ---
 
+This scenario defines the people, skills, projects, customers, and other information of a fictional systems integrator named `Contoso` as an ontology, and makes the ontology available to external AI agents through an MCP endpoint.
+In this hands-on workshop, you will learn how to create an ontology, use the graph database associated with it, and integrate AI agents through the MCP protocol.
 
+## Table of contents
+
+- Lab 1
+  1. Create lakehouses
+  2. Upload the sample data
+  3. Create the Bronze and Silver data layers
+- Lab 2
+  1. Create the ontology
+  2. Configure the MCP endpoint
+- Lab 3
+  1. Run the demonstration prompts
+  2. (Optional) Update the data and rerun the demonstration prompts
+
+## Prerequisites
+
+A paid Microsoft Fabric capacity is required to complete all parts of this workshop. Make sure that you use a workspace assigned to an F2 or higher Fabric capacity.
+
+### Using a trial capacity
+
+Some content cannot be run with a trial capacity. A paid F2 or higher Fabric capacity is required to use the Microsoft Fabric ontology created in this workshop as an MCP server.
+
+For information about trial capacity limitations, see:
+
+https://learn.microsoft.com/en-us/fabric/fundamentals/fabric-trial#whats-includedand-whats-not
+
+### Tenant settings
+
+To use ontology features in Fabric, you must enable the relevant tenant setting.
+
+https://learn.microsoft.com/en-us/fabric/iq/ontology/overview-tenant-settings
+
+Using an account assigned the Entra ID administrator role for a [Fabric administrator](https://learn.microsoft.com/en-us/fabric/admin/roles#power-platform-and-fabric-admin-roles), make sure that you enable the following setting:
+
+- Tenant settings -> Microsoft Fabric
+  - Users can create Ontology items
+
+The following settings aren't required for this workshop. However, if you want to use the ontology created during the workshop to evaluate Data Agent, Operations Agent, or similar features, enable them as needed.
+
+https://learn.microsoft.com/en-us/fabric/data-science/data-agent-tenant-settings
+
+- Tenant settings -> Copilot and AI
+  - Users can use Copilot, AI Agents and other AI experiences powered by Azure OpenAI
+  - Capacities can be designated as Fabric Copilot capacities
+  - Data sent to Azure OpenAI can be processed outside your capacity's geographic region, compliance boundary, or national cloud instance
+  - Data sent to Azure OpenAI can be stored outside your capacity's geographic region, compliance boundary, or national cloud instance
+
+## Sample data
+
+The sample contains 18 CSV files covering employees, customers, projects, availability, and other information. All names of people, companies, projects, and other data in these CSV files are fictional and generated using generative AI. They have no relationship to any real organization.
+
+The sample data is located in the `/data` directory. To resemble a production data lake, its directories are separated by source system.
+The directory names use the names of real products, but the data in those directories is fictional, as described above, and differs from data exported by the actual systems.
+
+### Data volume
+
+The sample data is designed to produce an ontology of approximately the following size.
+
+| Entity | Count | Notes |
+| :-- | :-- | :-- |
+| Employees | 200 | Pyramid structure across seven departments and seven job levels |
+| Customers | 29 | Seven industries, centered on eight manufacturing companies |
+| Projects | 93 | 39 completed, 39 in progress, and 15 planned |
+| Project assignments | 520 | Availability is calculated from these assignments |
+| Employee skills | 1,066 | Includes whether each skill is supported by project experience |
+| Monthly availability | 1,200 | 200 employees x six months (2026-08 through 2027-01) |
+| Lessons and knowledge | 279 | Wording varies by author, even for the same topic |
+| Deliverables | 216 | Includes a three-level reusability rating |
+| Opportunities | 13 | Includes required skills and expected close dates |
+
+### Data sources
+
+The sample CSV files assume that the required information is obtained from the systems listed below. The columns and values in each file were created specifically for this workshop and aren't guaranteed to match the formats available from the actual systems.
+
+| Data source | Type | Information provided |
+| :-- | :-- | :-- |
+| Entra ID | IdP | Sign-in identifiers and account status |
+| SAP SuccessFactors | Human capital management (HCM) | Employee records, including employee IDs, organizational information, certifications, and skills |
+| Dynamics 365 Project Operations | Professional services automation (PSA) | Employee availability and project assignment information |
+| SharePoint Online | Document management | Deliverable information |
+| Salesforce | Customer relationship management (CRM) | Customer information, customer contacts, and opportunities |
+| Dataverse | Master data | Skill, certification, and technology master data |
+| Confluence | Knowledge management | Knowledge, lessons learned, and best practices recorded by project teams |
+| ServiceNow | Project portfolio management (PPM) | Project details, technologies used, and required skills |
+
+The sample data in this repository omits master data management (MDM) considerations. In a real implementation, additional work might be required to associate internal IDs issued by the different systems. Because this isn't the main subject of the workshop, that process is outside its scope.
+
+## Notes
+
+- Ontology features in Fabric IQ can change as the service is updated.
+- All names, companies, projects, monetary amounts, and other information in the sample data are fictional.
