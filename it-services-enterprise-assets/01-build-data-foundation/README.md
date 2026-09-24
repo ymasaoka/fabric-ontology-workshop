@@ -1,7 +1,9 @@
+_(English version follows below)_
+
 # Lab 01 - データ基盤をつくる
 
 **所要時間** : 約 20 分  
-**ゴール** : `lh_sier_asset_silver` に、オントロジーがバインドできる `sv_*` テーブルが 17 本そろっている状態
+**ゴール** : `lh_sier_asset_silver` に、オントロジーがバインドできる `sv_*` テーブルが 17 本そろっている状態  
 
 ---
 
@@ -156,3 +158,163 @@ ingest_date 列は、ファイルパスの `<yyyy>/<MM>/<dd>` ディレクトリ
 | 列が `_c0`, `_c1` になる | ヘッダーが読まれていない | `option("header", "true")` が有効か、CSV が空でないか確認する |
 | 列名の先頭に見えない文字が付く | BOM が残っている | ノートブックの列名クレンジング処理が実行されているか確認する |
 | `TABLE_OR_VIEW_NOT_FOUND` | テーブル参照のスキーマ指定漏れ、またはレイクハウス未アタッチ | Fabric のテーブル参照は3階層（`<レイクハウス>.<スキーマ>.<テーブル>`）。`nb_02` の `BRONZE_SCHEMA` を スキーマ有効なら `'dbo'`、スキーマ無効（レガシー）なら `None` に設定する。あわせて `nb_02` に bronze / silver の両方がアタッチされているか確認する |
+
+---
+
+# Lab 01 - Build the Data Foundation
+
+**Estimated time**: Approximately 20 minutes  
+**Goal**: Have all 17 `sv_*` tables available in `lh_sier_asset_silver` so that the ontology can bind to them  
+
+---
+
+## 0. What You Will Build in This Lab
+
+| Item | Name | Purpose |
+|---|---|---|
+| Workspace | `(any workspace name)` | Hosts the various items created during the workshop |
+| Lakehouse | `lh_its_asset_bronze` | Bronze-layer lakehouse that ingests CSV files and stores them as Delta tables |
+| Lakehouse | `lh_its_asset_silver` | Silver-layer lakehouse that stores data transformed from the bronze-layer lakehouse for use as ontology binding targets |
+| Notebook | `nb_01_ingest_bronze` | Notebook that converts the ingested CSV files into Delta tables. |
+| Notebook | `nb_02_build_silver` | Notebook that retrieves the contents of the bronze-layer Delta tables and transforms them into silver-layer Delta tables. |
+
+## 1. Create a Workspace
+
+Create a new workspace in Fabric. Give the workspace an easy-to-understand name. (For example, `ws_its_asset_Ontology_demo`.)
+
+## 2. Create the Lakehouses
+
+Create the bronze-layer and silver-layer lakehouses.
+
+1. Open the workspace you created.
+2. From `+ New item`, select **Lakehouse**.
+3. Enter `lh_its_asset_bronze` as the name.
+  Confirm that the workspace created in step 1 is selected as the location.
+  Turn **on** the Lakehouse schemas checkbox.
+4. Select **Create** to create the lakehouse.
+5. Follow the same steps to create `lh_its_asset_silver`.
+
+## 3. Download the Sample Data
+
+Download the sample data stored under the `data` directory in this repository to your local machine.
+
+## 4. Upload the Sample Data
+
+Upload the sample data stored under the downloaded `data` folder to the bronze-layer lakehouse.
+
+1. Open `lh_its_asset_bronze`.
+2. Right-click **Files** in the Explorer.
+3. Select **Upload -> Upload folder**.
+4. Select the `confluence` folder inside the downloaded `data` folder, and then select **Upload**.
+5. If a file upload confirmation pop-up appears, select **Upload**.
+6. Select **Upload** to upload the file/folder.
+7. Follow the same steps to upload the remaining folders listed below under the Files directory.
+  - d365_project_operations
+  - dataverse
+  - entra_id
+  - salesforce
+  - servicenow
+  - sharepoint_online
+  - successfactors
+
+When complete, the structure under Files should look like this:
+
+```
+Files/
+├── confluence/
+│   └── knowledge/2026/08/05/knowledge_20260805.csv
+├── d365_project_operations/
+│   ├── assignment/2026/08/05/assignment_20260805.csv
+│   └── availability/2026/08/05/availability_20260805.csv
+├── dataverse/
+│   ├── certification/2026/08/05/certification_20260805.csv
+│   ├── skill/2026/08/05/skill_20260805.csv
+│   └── technology/2026/08/05/technology_20260805.csv
+├── entra_id/
+│   └── person/2026/08/05/person_20260805.csv
+├── salesforce/
+│   ├── customer/2026/08/05/customer_20260805.csv
+│   ├── opportunity/2026/08/05/opportunity_20260805.csv
+│   └── stakeholder/2026/08/05/stakeholder_20260805.csv
+├── servicenow/
+│   ├── project/2026/08/05/project_20260805.csv
+│   ├── project_required_skill/
+│   │   └── 2026/08/05/project_required_skill_20260805.csv
+│   └── project_technology/
+│   │   └── 2026/08/05/project_technology_20260805.csv
+├── sharepoint_online/
+│   └── deliverable/2026/08/05/deliverable_20260805.csv
+└── successfactors/
+    ├── employee_profile/2026/08/05/employee_profile_20260805.csv
+    ├── organization/2026/08/05/organization_20260805.csv
+    ├── person_certification/
+    │   └── 2026/08/05/person_certification_20260805.csv
+    └── person_skill/2026/08/05/person_skill_20260805.csv
+```
+
+## 5. Create the Bronze-Layer Delta Tables
+
+Using a Microsoft Fabric notebook, create bronze-layer Delta tables in `lh_its_asset_bronze` based on the uploaded CSV files.
+
+1. Download the [nb_01_ingest_bronze.ipynb](./nb_01_ingest_bronze.ipynb) file.
+2. Open the workspace you created.
+3. At the top of the workspace screen, select **Import -> Notebook -> From this computer**.
+4. Select the downloaded notebook file and **Upload** it.
+5. Select and open `nb_01_ingest_bronze`.
+6. From the Explorer on the left side of the screen, select **Add data items -> From OneLake catalog**.
+7. Select `lh_its_asset_bronze`, and then select **Add**.
+8. Confirm that the runtime language is **PySpark (Python)** and the environment is **Workspace default**, and then select **Run all**.
+9. Confirm that 18 Delta tables whose names begin with `bz_` have been created under Tables in `lh_its_asset_bronze`.
+
+This notebook removes information such as the BOM and leading or trailing whitespace from the CSV column names, and then adds the following columns:
+
+- `ingest_date`
+- `_source_system`
+- `_source_entity`
+- `_ingested_at`
+
+The ingest_date column refers to the `<yyyy>/<MM>/<dd>` directory information in the file path and contains the ingestion date of the latest data. This column is also used later when creating the silver-layer Delta tables.
+Columns whose names begin with an underscore (_) are audit columns.
+
+## 6. Create the Silver-Layer Delta Tables
+
+As with the processing performed for the bronze-layer lakehouse, use a Microsoft Fabric notebook to create the silver-layer Delta tables in `lh_its_asset_silver`.
+
+1. Download the [nb_02_build_silver.ipynb](./nb_02_build_silver.ipynb) file.
+2. Open the workspace you created.
+3. At the top of the workspace screen, select **Import -> Notebook -> From this computer**.
+4. Select the downloaded notebook file and **Upload** it.
+5. Select and open `nb_02_build_silver`.
+6. From the Explorer on the left side of the screen, select **Add data items -> From OneLake catalog**.
+7. Select `lh_its_asset_silver`, and then select **Add**.
+8. Follow the same steps to add `lh_its_asset_bronze`.
+9. Confirm that `lh_its_asset_silver` is set as the default lakehouse. (It is the default if a pin appears to the right of its name.)
+  If it is not the default lakehouse, right-click it and set it as the default lakehouse.
+10. Confirm that the runtime language is **PySpark (Python)** and the environment is **Workspace default**, and then select **Run all**.
+11. Confirm that 17 Delta tables whose names begin with `sv_` have been created under Tables in `lh_its_asset_silver`.
+
+## 7. Summary
+
+In this lab, you ingested sample data collected from multiple business systems into the bronze layer and created a silver layer shaped for convenient use by the ontology.
+
+- Created 18 `bz_*` tables in `lh_its_asset_bronze` to store the ingested data
+- Created 17 `sv_*` tables in `lh_its_asset_silver` with processing such as selecting the latest data, removing duplicates, and generating keys
+- Added audit columns to track the source and ingestion time of the data
+- Established a state in which data quality and freshness can be checked using `dq_silver_status`
+
+The bronze layer retains the data from each source system as-is, while the silver layer prepares it so that it can be handled as business entities such as "people," "organizations," "projects," "customers," and "skills."
+
+You are now ready to bind ontology entity types and relationship types to actual data.
+
+In the next lab, [Lab 02 - Build and Connect the Ontology](../02-model-and-connect-ontology/README.md), you will use the `lh_its_asset_silver` tables created in this lab to build an ontology and connect the previously distributed business data through meaning and relationships.
+
+## Troubleshooting
+
+| Symptom | Common Cause | Resolution |
+|---|---|---|
+| Validation query returns 0 rows | Some CSV files were not uploaded | Confirm that there are 18 tables in the bronze layer |
+| `SILVER_BUILD_STATUS = WARN` | Business keys are duplicated within the same ingestion date (an actual source-data error) | Check the contents of `dq_*_duplicates`. If records were registered twice, correct the source; otherwise, add a column to the business key in `ENTITIES` in `nb_02` |
+| Warning that the date cannot be determined | The folder hierarchy is incorrect | Confirm that it has the four-level structure `Files/<system>/<entity>/<yyyy>/<MM>/<dd>/` |
+| Columns are named `_c0`, `_c1` | The header was not read | Confirm that `option("header", "true")` is enabled and that the CSV is not empty |
+| An invisible character appears at the beginning of a column name | The BOM remains | Confirm that the notebook's column-name cleansing process was executed |
+| `TABLE_OR_VIEW_NOT_FOUND` | The schema was omitted from the table reference, or the lakehouse is not attached | Fabric table references have three levels (`<lakehouse>.<schema>.<table>`). Set `BRONZE_SCHEMA` in `nb_02` to `'dbo'` when schemas are enabled, or to `None` when schemas are disabled (legacy). Also confirm that both bronze and silver are attached to `nb_02` |
