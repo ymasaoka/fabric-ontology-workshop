@@ -51,6 +51,17 @@ https://learn.microsoft.com/ja-jp/fabric/data-science/data-agent-tenant-settings
   - Azure OpenAI に送信されたデータは、容量の地理的リージョン、コンプライアンス境界、または国内クラウド インスタンスの外部で処理できます
   - Azure OpenAI に送信されたデータは、容量の地理的リージョン、コンプライアンス境界、または国内クラウド インスタンスの外部に格納できます
 
+### ワークスペース設定
+
+2026/09 より、Fabric Runtime 2.0 が GA (一般提供開始) となったことに伴い、ワークスペース内で使用するノートブックの Spark ランタイムの既定値を `Runtime 2.0` に設定する必要があります。
+ワークスペースの管理者権限を持つユーザにて、Runtime 2.0 の設定を行ってください。  
+
+https://learn.microsoft.com/ja-jp/fabric/data-engineering/runtime-2-0
+
+- ワークスペースの設定
+  - データ エンジニアリング/サイエンス -> Spark の設定
+    - 環境 -> ランタイム バージョン -> 2.0 (Spark 4.1, Delta 4.2)
+
 ## サンプルデータ
 
 社員情報や顧客情報、案件情報や稼働情報など、計 18 個の CSV ファイルが存在します。各 CSV ファイルに含まれる人名や企業名、案件名などのデータは生成 AI によって作成された架空の情報であり、実在する企業などとの関係は一切ありません。  
@@ -146,6 +157,17 @@ https://learn.microsoft.com/en-us/fabric/data-science/data-agent-tenant-settings
   - Capacities can be designated as Fabric Copilot capacities
   - Data sent to Azure OpenAI can be processed outside your capacity's geographic region, compliance boundary, or national cloud instance
   - Data sent to Azure OpenAI can be stored outside your capacity's geographic region, compliance boundary, or national cloud instance
+
+### Workspace settings
+
+With the general availability (GA) of Fabric Runtime 2.0 in September 2026, you must set the default Spark runtime version for notebooks in the workspace to `Runtime 2.0`.
+Have a user with workspace administrator permissions configure Runtime 2.0.
+
+https://learn.microsoft.com/en-us/fabric/data-engineering/runtime-2-0
+
+- Workspace settings
+  - Data Engineering/Science -> Spark settings
+    - Environment -> Runtime version -> 2.0 (Spark 4.1, Delta 4.2)
 
 ## Sample data
 
