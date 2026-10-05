@@ -15,6 +15,8 @@ _(English version follows below)_
 
 ## 1. MCP サーバのエンドポイントを確認する
 
+開始前に、[Lab 02 の「グラフの探索を有効化する」](../02-model-and-connect-ontology/README.md#enable-graph-ja)を完了してください。本ラボでは、Web画面での取り込み完了と実データの検索を確認してから MCP に接続します。`nb_03` の成功表示やスキーマ一覧の取得だけでは、グラフ検索の準備完了とは判断しません。
+
 Microsoft Fabric のオントロジーは、MCP (Model Context Protocol) に対応しており、MCP サーバーとして外部の AI エージェントと MCP を通じて対話できます。  
 つまり、公開されたオントロジーは、社内の Copilot をはじめ、Copilot Studio や GitHub Copilot、Claude Code など、様々な AI エージェントで、同一のオントロジーを扱うことができるということです。  
 
@@ -85,30 +87,44 @@ fabric-iq-ontology-its-asset のオントロジーに接続して、エンティ
 
 ```
 製造業のお客様向けの生成AI案件を経験していて、Microsoft Fabric または Azure Databricks のスキルを持ち、2026年9月に30%以上の空き工数があるメンバーを探して。
-名前・所属・役職・保有スキルのレベル・根拠になった案件・9月の空き工数を表にまとめて。
+スキルは自己申告も含め、レベルは問わない。
+名前・所属・役職・スキルとレベル・経験した生成AI案件・9月の空き工数を、1人1行の表にまとめて。
+各スキルの裏付けとなる案件も示し、自己申告や根拠不明の場合はその旨を書いて。
 ```
 
 <u>**成功条件**</u>  
 
-_3 名_ に絞り込まれ、それぞれに根拠案件と空き工数がついていること。  
-検索結果が 1 名だけや、十数名のもので返ってくる場合は、LLM 側の推論により、どこかの条件が効いていない可能性があります。「製造業の顧客に限定してしるか」「案件の領域が AI のものなっているか」と、条件を 1 つずつ確認してみてください。  
+同梱の `2026-08-05` 時点のサンプルデータでは、上の初回質問は **自己申告を含む3名**（松本 麻衣・石川 俊介・山本 隆之）に該当します。山本さんには製造業向け生成AI案件への参加実績がありますが、対象スキルの登録は **Azure Databricks・初級・自己申告**で、スキルの根拠案件は未登録です。Microsoft Fabric のスキル登録もありません。
+
+条件を追加すると期待値は変わります。案件への参加実績があることと、対象スキルが案件実績で裏付けられていることは別の条件です。
+
+| 対象スキルの追加条件 | サンプルデータでの該当者 |
+|---|---|
+| なし（自己申告を含み、レベル不問） | 3名：松本 麻衣・石川 俊介・山本 隆之 |
+| `EvidenceType = 案件実績` | 2名：松本 麻衣・石川 俊介 |
+| 案件実績に加え、同じ対象スキルが上級以上で、根拠案件が完了済み | 1名：松本 麻衣 |
+
+初回質問に対してエージェントが独自に「案件実績のみ」を追加した場合は、2名の内訳が正しくても初回質問への回答としては絞り込みすぎです。一方、利用者がその条件を追加した場合は2名が期待値です。人数だけで正誤を判断せず、実際の質問・会話で引き継いだ条件・実行クエリ・参照データを照合してください。データを更新した場合、上記人数は固定の期待値ではありません。
 
 <u>**確認ポイント**</u>  
 
-- `Customer.Industry` → `Project` → `Assignment` → `Person` → `PersonSkill` → `Availability` と、5つの関係をまたいで初めて答えが出ているか
+- `Assignment`・`Project`・`Customer` から、本人の製造業向け生成AI案件への参加実績を確認しているか
+- `PersonSkill`・`Skill` から対象スキルを確認し、`EvidenceType` と `EvidenceProjectId` による裏付けを参加実績と区別しているか
+- その人の2026年9月の空き工数が30%以上であることを確認しているか
+- 出力が1人につき1行で、松本さんの Fabric と Databricks が同じ行にまとまり、スキルごとの根拠が混同されていないか
 
 #### 追い込み質問（レベルと根拠）
 
 ```
-その中で、Microsoft Fabric または Azure Databricks のレベルが上級以上の人だけに絞って。
-絞られた人の Microsoft Fabric のスキルは、何を根拠にそう言えるのかを説明して。
+その中から、Microsoft Fabric または Azure Databricks が上級以上で、そのスキルに完了済み案件の裏付けがある人に絞って。
+該当するスキル・レベル・裏付けとなる案件を、1人1行の表にまとめて。
 ```
 
-出力された情報を従業員 (Person) 情報をベースに、`PersonSkill` の根拠案件と証拠種別をたどり、完了済みの案件実績から適切な要因絞り込みを行います。  
+`PersonSkill` の同じレコードで対象スキル・レベル（`上級` または `エキスパート`）・`EvidenceType = 案件実績` を確認し、`EvidenceProjectId` が指す `Project.Status = 完了` も確認します。製造業向け生成AI案件とスキルの根拠案件が同一であることは要求していません。
 
 <u>**成功条件**</u>  
 
-絞り込みの結果、_1 名 (松本 麻衣)_ さんのみになります。
+同梱サンプルデータでは **1名（松本 麻衣）**に絞り込まれます。石川さんの対象スキルは Microsoft Fabric・中級なので除外されます。松本さんは Microsoft Fabric・エキスパートと Azure Databricks・上級があり、どちらも完了済み案件による裏付けがあります。
 
 ### 3-3. 提案準備（類似案件と有識者検索）
 
@@ -397,9 +413,9 @@ MCP を利用すれば、同じオントロジーを複数の AI エージェン
 | 症状 | 原因として多いもの | 対処 |
 |---|---|---|
 | オントロジー MCP の URL もアカウント認証も適切だが認証がエラー | Microsoft Edge の認証プロファイルにより認証先テナントが誤認識されてしまう | Microsoft Edge の既定プロファイルを認証で使用するものに変更して認証を再実施 |
-| 検索が失敗する | エンティティが見つからず search_ontology が失敗する | Microsoft Foundry Agent など別のツールを使用して再実施 |
+| 検索が失敗する | `search_ontology` がエンティティを見つけられない | 対象オントロジーと型名を確認し、[Lab 02 のWeb手順](../02-model-and-connect-ontology/README.md#enable-graph-ja)で投影対象・取り込み完了・Explore graph の実データ検索を確認する。失敗が続く場合はツールの実エラーと権限も確認する |
 | 検索が失敗する | Fabric compute capacity has exceeded its limit と出る | Fabric 容量を上位のものに切り替え |
-| 検索結果が 0 件になる | オントロジーに紐づくグラフデータベースの更新ができていない | nb_03_build_ontology にてグラフデータベースの取り込みが正常に完了しているか確認する |
+| 検索結果が 0 件になる | 検索条件に該当しない、投影対象が不足、またはグラフのデータが未更新 | 検索条件とソースデータを照合し、Manage graph の対象と取り込み状態を確認する。データ更新後は関連グラフモデルの Schedule → Refresh now を実行する。`nb_03` はグラフ取り込みを行わない |
 
 ---
 
@@ -417,6 +433,8 @@ In this lab, you will connect Visual Studio Code to the ontology as an MCP clien
 You will also examine how metadata configured in the ontology—such as business terms, synonyms, and property descriptions—helps an AI agent interpret queries and formulate answers.
 
 ## 1. Check the MCP Server Endpoint
+
+Before starting, complete [Enable Graph Exploration in Lab 02](../02-model-and-connect-ontology/README.md#enable-graph-en). This lab checks web-based ingestion and actual data searches before connecting through MCP. A successful `nb_03` run or a schema listing alone does not establish graph-query readiness.
 
 Microsoft Fabric ontologies support MCP (Model Context Protocol) and can interact with external AI agents through MCP as an MCP server.
 In other words, a published ontology can be used consistently by various AI agents, including your organization's Copilot, Copilot Studio, GitHub Copilot, and Claude Code.
@@ -490,34 +508,48 @@ The response retrieves 17 entity types and 19 relationship types and explains th
 
 ```
 Find members who have experience with generative AI projects for manufacturing customers, have Microsoft Fabric or Azure Databricks skills, and have at least 30% availability in September 2026.
-Summarize their names, departments, job titles, skill levels, supporting projects, and September availability in a table.
+Include self-reported skills at any level.
+Use one row per person to show their name, department, job title, skills and levels, generative AI project experience, and September availability.
+Also show the projects supporting each skill, or mark it as self-reported or lacking evidence.
 
-When searching the ontology, use Japanese search terms and match the Japanese values stored in OneLake. Provide the final answer in English.
+Search using Japanese data values and answer in English.
 ```
 
 <u>**Success criteria**</u>
 
-The results are narrowed down to _3 people_, each with a supporting project and availability.
-If the search returns only one person or more than ten people, one of the conditions may not have been applied because of the LLM's reasoning. Check each condition one at a time, such as whether the results are limited to manufacturing customers and whether the project domain is AI.
+For the bundled sample data dated `2026-08-05`, the initial question matches **3 people, including self-reported skills**: 松本 麻衣, 石川 俊介, and 山本 隆之. 山本 has manufacturing generative AI project participation, but his target skill record is **Azure Databricks, Beginner, self-reported**, with no skill evidence project. No Microsoft Fabric skill record is present for him.
+
+Additional conditions change the expected result. Participation in a project and project-backed evidence for a particular skill are separate conditions.
+
+| Additional target-skill conditions | Matches in the sample data |
+|---|---|
+| None: include self-reported skills at any level | 3: 松本 麻衣, 石川 俊介, 山本 隆之 |
+| `EvidenceType = 案件実績` (project experience) | 2: 松本 麻衣, 石川 俊介 |
+| Project-backed evidence, the same target skill at Advanced or higher, and a completed evidence project | 1: 松本 麻衣 |
+
+If the agent independently adds "project-backed skills only" to the initial question, its two-person answer is over-filtered even if those two people qualify. If the user explicitly adds that condition, two is the expected result. Do not judge correctness by the count alone: compare the actual question, conditions retained from the conversation, executed query, and source data. These counts are not fixed expectations after the data changes.
 
 <u>**Validation points**</u>
 
-- The answer is produced only after traversing five relationships: `Customer.Industry` → `Project` → `Assignment` → `Person` → `PersonSkill` → `Availability`
+- Verify the person's manufacturing generative AI project participation through `Assignment`, `Project`, and `Customer`.
+- Verify the target skills through `PersonSkill` and `Skill`, distinguishing `EvidenceType` and `EvidenceProjectId` from project participation.
+- Verify that each person's September 2026 availability is at least 30%.
+- Verify that there is one row per person, with 松本's Fabric and Databricks skills in the same row and the evidence correctly associated with each skill.
 
 #### Follow-up Question (Level and Evidence)
 
 ```
-Of those people, narrow the results to only those whose Microsoft Fabric or Azure Databricks level is Advanced or higher.
-Explain the evidence supporting the selected people's Microsoft Fabric skills.
+Of those people, keep only those with Microsoft Fabric or Azure Databricks at Advanced or higher, supported by completed projects for that skill.
+Show the qualifying skills, levels, and supporting projects in a table with one row per person.
 
-When searching the ontology, use Japanese search terms and match the Japanese values stored in OneLake. Provide the final answer in English.
+Search using Japanese data values and answer in English.
 ```
 
-Based on the employee (`Person`) information in the output, trace the supporting project and evidence type in `PersonSkill`, and appropriately narrow the results using completed project experience.
+Check the target skill, proficiency (`上級` or `エキスパート`), and `EvidenceType = 案件実績` on the same `PersonSkill` record, then verify that `EvidenceProjectId` refers to a project with `Project.Status = 完了`. The manufacturing generative AI project and the skill evidence project do not have to be the same project.
 
 <u>**Success criteria**</u>
 
-The results are narrowed down to only _1 person (松本 麻衣)_.
+For the bundled sample data, the result is **1 person (松本 麻衣)**. 石川 is excluded because his target skill is Microsoft Fabric at Intermediate level. 松本 has Microsoft Fabric at Expert level and Azure Databricks at Advanced level, both supported by completed projects.
 
 ### 3-3. Proposal Preparation (Similar Projects and Expert Search)
 
@@ -832,6 +864,6 @@ This concludes the lab. We hope that the ontology usage methods explored here wi
 | Symptom | Common cause | Resolution |
 |---|---|---|
 | Authentication fails even though the ontology MCP URL and account authentication are correct | The authentication target tenant is misidentified because of the Microsoft Edge authentication profile | Change the default Microsoft Edge profile to the one used for authentication, and authenticate again |
-| Search fails | `search_ontology` fails because the entity cannot be found | Try again using another tool, such as Microsoft Foundry Agent |
+| Search fails | `search_ontology` cannot find an entity | Check the ontology and type names, then verify projection scope, ingestion completion, and actual data in Explore graph using the [Lab 02 web steps](../02-model-and-connect-ontology/README.md#enable-graph-en). If it still fails, inspect the tool error and permissions |
 | Search fails | The message `Fabric compute capacity has exceeded its limit` appears | Switch to a higher Fabric capacity |
-| Search results contain 0 records | The graph database associated with the ontology has not been updated | In nb_03_build_ontology, confirm that graph database ingestion completed successfully |
+| Search results contain 0 records | No matching data, incomplete projection scope, or stale graph data | Check filters and source data, then verify scope and ingestion in Manage graph. After data changes, use Schedule → Refresh now on the associated graph model. `nb_03` does not ingest graph data |

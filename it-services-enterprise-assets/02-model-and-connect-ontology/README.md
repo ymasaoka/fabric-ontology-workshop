@@ -12,7 +12,7 @@ _(English version follows below)_
 | アイテム | 名前 | 役割 |
 |---|---|---|
 | オントロジー | `ont_its_asset` | ワークショップで作成する各種アイテムを配置 |
-| ノートブック | `nb_03_build_ontology` | シルバー層のレイクハウスにある Delta テーブルの内容を元にオントロジーの作成とグラフモデルの設定を行うノートブック。 |
+| ノートブック | `nb_03_build_ontology` | シルバー層の Delta テーブルを元に、新 TMDL 形式のオントロジー定義を設定・検証する。 |
 
 このラボを進めるにあたっては、[事前準備に記載の設定](../README.md#事前準備) を行う必要があります。確認を行ってから実施するようにしてください。  
 
@@ -26,13 +26,9 @@ Microsoft Fabric では、オントロジーを扱う場合、ワークスペー
   場所は 1. で作成したワークスペース名が選択されていることを確認します。  
 4. **作成** を選択して、オントロジーを作成します。 
 
-オントロジーの作成が完了したら、ワークスペースの画面を開いてみてください。`ont_its_asset` の項目に紐づく子項目として、以下の 3 つが作成されていることを確認できます。  
+新エクスペリエンスのオントロジーは、定義とデータソースへのバインドを保持する意味付けの層です。グラフ実行はオプションであり、データが自動的にすべてグラフへコピーされるわけではありません。このラボでは、ノートブックで全定義を作成した後、[7章のWeb画面の手順](#enable-graph-ja)でグラフをマテリアライズ（検索用のグラフにデータを読み込むこと）します。サービスが管理する関連アイテムは、手動で削除しないでください。
 
-- グラフモデル (ont_its_asset_graph_xxxxxxxx)
-- レイクハウス (ont_its_asset_lh_xxxxxxxx)
-- SQL 分析エンドポイント (ont_its_asset_lh_xxxxxxxxx)
-
-これらはオントロジーを利用するにあたって裏で必要となる管理アーティファクトになるため、誤って削除しないようにしてください。  
+参考: [Ontology overview — Optional graph execution](https://learn.microsoft.com/en-us/fabric/iq/ontology/overview#optional-graph-execution)
 
 Microsoft Fabric のオントロジーでは、大きく分けて以下の 4 つを定義することになります。
 
@@ -66,60 +62,26 @@ Microsoft Fabric のオントロジーでは、大きく分けて以下の 4 つ
 1. ホーム画面にて、エクスプローラー上に表示されている `Person` を選択し、**エンティティ型の詳細を表示** を選択します。
 2. **構成** タブを選択します。
 3. `プロパティ` 欄にある **プロパティ バインドの管理 -> バインドとプロパティの追加** を選択します。
-4. `バインディングの選択` 欄にて **データ バインディングの追加 -> レイクハウス テーブル** を選択します。
-5. `lh_its_asset_silver` を選択し、**次へ** を選択します。
-6. OneLake -> lh_its_asset_silver -> Tables -> dbo を選択し、**sv_person** を選択します。
-7. **エンティティ型キー -> エンティティ型キーの定義** を選択します。
-8. プロパティ一覧のプルダウンリストより、**PersonId** を選択します。
-9. キーとして使用する選択済みプロパティに `PersonId` のみが表示されていることを確認し、**保存** を選択します。
-10. プロパティ欄に、レイクハウスの Delta テーブルの列名と同じ数のプロパティが表示されていることを確認します。(表示されていない場合は、作業を中断し、1 の手順からやり直してください)
-11. プロパティ欄に表示されている `_valid_as_of` の行の横に表示されているごみ箱アイコンを選択し、**_valid_as_of 行を削除** します。
-12. **保存** を選択します。
-13. `エンティティ型が正常に更新されました` のバナー表示を確認の上、**キャンセル** を選択します。
-14. **インスタンス** タブを選択し、Person エンティティにバインドした実データが表示されることを確認します。
-15. 同じ手順で、残りのエンティティに対しても同じようにプロパティの設定と実データへのバインドを行います。
-  設定の詳細については、以下の表を参照してください。`Project` と `Assignment` では日時型のプロパティがタイムスタンプ列の候補として表示されますが、このラボでは時系列プロパティを定義しないため `なし` を選択します。
+4. `バインディングの選択` 欄にて、ソース欄にある **追加** を選択します。
+5. `lh_its_asset_silver` が表示されることを確認し、展開します。
+  dbo -> `sv_person` を選択し、**テーブルの選択** を選択します。
+6. **エンティティ型のプロパティ** を選択します。
+7. プロパティ欄に表示されている `_valid_as_of` の行の横に表示されているごみ箱アイコンを選択し、**_valid_as_of 行を削除** します。
+8. **作成する** を選択し、設定が保存されることを確認します。
+9. **キャンセル** を選択し、Person エンティティのプロパティ画面に遷移します。  
+  設定したデータバインドの内容が画面に表示されることを確認します。
+10. **インスタンス** タブを選択し、Person エンティティにバインドした実データが表示されることを確認します。
+  確認出来たら、画面左上にあるパンくずリストの **ホーム** を選択し、ホーム画面に戻ります。
+11. 同じ手順で、残りのエンティティに対しても同じようにプロパティの設定と実データへのバインドを行います。
 
-  | エンティティ | データバインド先 | エンティティ型キー | 時系列データ -> タイムスタンプ列 | プロパティの追加/削除 |
-  | :-- | :-- | :-- | :-- | :-- |
-  | `Project` | `sv_project` | `ProjectId` | `なし` | (削除) `_valid_as_of` |
-  | `Customer` | `sv_customer` | `CustomerId` | — | (削除) `_valid_as_of` |
-  | `Organization` | `sv_organization` | `OrganizationId` | — | (削除) `_valid_as_of` |
-  | `Assignment` | `sv_assignment` | **`AssignmentKey`** | `なし` | **(削除) `AssignmentId`**<br/>(削除) `_valid_as_of` |
+  | エンティティ | データバインド先 | プロパティの追加/削除 |
+  | :-- | :-- | :-- |
+  | `Project` | `sv_project` | (削除) `_valid_as_of` |
+  | `Customer` | `sv_customer` | (削除) `_valid_as_of` |
+  | `Organization` | `sv_organization` | (削除) `_valid_as_of` |
+  | `Assignment` | `sv_assignment` | **(削除) `AssignmentId`**<br/>(削除) `_valid_as_of` |
 
-### (解説1) Assignment エンティティ
-
-Assignment エンティティのみ、エンティティ型キーの設定が Id 列を指定せず他と異なっています。なぜそうなっているのかについて解説します。  
-
-`Assignment` は、従業員とプロジェクトの間にある「誰が、どの案件にアサインされているか」を表す関連実体です。このラボでは、`PersonId` と `ProjectId` の組み合わせを一つのアサインを識別する業務キーとして扱います。
-
-元データの `AssignmentId` はソースシステムが採番した ID です。データの再登録や再エクスポートによって値が変わる可能性があるため、これをオントロジーのエンティティ型キーにすると、業務上は同じアサインであっても別のエンティティとして認識されるおそれがあります。反対に、異なる環境や時点で同じ ID が再利用された場合は、別のアサインを同一のエンティティとして扱うおそれがあります。
-
-そこで、シルバー層を作成する `nb_02_build_silver` では、次のように業務キーから決定論的な `AssignmentKey` を生成しています。
-
-```text
-AssignmentKey = SHA-256(PersonId + "|" + ProjectId)
-```
-
-同じ従業員とプロジェクトの組み合わせからは常に同じ値が生成されるため、ソース側の `AssignmentId` が変わっても、オントロジー上では同じ Assignment エンティティとして識別できます。また、`performedBy` リレーションでは、この `AssignmentKey` で Assignment を特定し、`PersonId` を使って担当者の Person エンティティへ接続します。
-
-この設計は、単に ID という名前の列をキーにするのではなく、**業務上、同じ実体であり続けるための条件をエンティティ型キーにする**という考え方に基づいています。なお、このラボでは「一人の従業員が一つのプロジェクトに持つ現在のアサインは一つ」という前提です。同じ従業員とプロジェクトの間に複数のアサインを区別して保持する必要がある場合は、役割や有効期間などを業務キーに追加する必要があります。
-
-### (解説2) 時系列データ
-
-Fabric オントロジーでは、通常のプロパティと時系列プロパティは区別して定義されます。**タイムスタンプ列に指定するのは、時系列プロパティの観測時刻を表す列だけです。** ソース列の型としては `datetime`、`date`、`timestamp` がサポートされていますが、対応する型の列をすべてタイムスタンプ列にするわけではありません。
-
-たとえば、`Project.StartDate` / `Project.EndDate` や `Assignment.StartDate` / `Assignment.EndDate` は、プロジェクトやアサインの期間を表す通常のプロパティです。時系列プロパティの観測時刻ではないため、タイムスタンプ列には指定せず `なし` を選択します。
-
-時系列データをバインドする場合は、先に静的データのバインドとエンティティ型キーの定義を完了させます。その後、同じエンティティ型に時系列データのソースを追加し、静的データのキーと一致する列でエンティティを対応付け、時系列データ内の観測時刻を表す列をタイムスタンプ列として選択します。時系列データには OneLake または Eventhouse のテーブルを使用できます。
-
-このラボの GUI 手順で作成する 5 つのエンティティは静的データのみをバインドするため、時系列プロパティおよび時系列バインドは追加しません。
-
-> 参考（Microsoft Learn）
-> - [オントロジーへのデータのバインド](https://learn.microsoft.com/ja-jp/fabric/iq/ontology/how-to-bind-data)
-> - [チュートリアル パート 2: オントロジーを追加データで強化する](https://learn.microsoft.com/ja-jp/fabric/iq/ontology/tutorial-2-enrich-ontology)
-
-### (解説3) 一部のプロパティを削除した理由
+### (解説) 一部のプロパティを削除した理由
 
 `_valid_as_of` や `AssignmentId` について、プロパティ情報から削除を行いました。これがなぜかについて解説します。  
 
@@ -138,29 +100,31 @@ AI エージェントは、エンティティのプロパティから意味を�
 4. `ターゲット エンティティ型` のプルダウンリストより、**Organization** を選択します。
 5. **作成** を選択します。
 6. `belongsTo` のリレーションが作成され、Person エンティティと Organization エンティティがつながっていることを確認します。
-7. **belongsTo** を選択します。
-8. `マッピング テーブル` にて、**使用可能なソースの参照 -> sv_person** を選択します。  
-  (sv_person が一覧に表示されない場合は、使用可能なソースの参照から選択を行ってください)
-9. `一致した Person: PersonId` 項目にて、**PersonId** を選択します。  
-10. `一致した Organization: OrganizationId` 項目にて、**OrganizationId** を選択します。
-11. **保存** を選択します。
-12. `リレーションシップの種類が正常に更新されました` のバナー表示を確認の上、**ホーム** を選択します。
-13. 同じ手順で、2 つのリレーション設定を行います。
+7. Person から Organization に対して表示されている矢印上の **belongsTo** を選択します。
+8. **マッピング テーブルを使用する** をオフにし、`元のエンティティ型` のプロパティにて、**OrganizationId** を選択します。
+9. `ターゲット エンティティ型` のプロパティにて、**OrganizationId** を選択します。
+10. **保存** を選択します。
+11. `リレーションシップの種類が正常に更新されました` のバナー表示を確認の上、**ホーム** を選択します。
+12. 同じ手順で、2 つのリレーション設定を行います。
   設定の詳細については、以下の表を参照してください。
 
-  | リレーションシップ名 | 元のエンティティ型 | ターゲット エンティティ型 | マッピング テーブル | 元のエンティティ型の列 | ターゲット エンティティ型の列 |
-  | :-- | :-- | :-- | :-- | :-- | :-- |
-  | `performedBy` | `Assignment` | `Person` | `sv_assignment` | `AssignmentKey` | `PersonId` |
-  | `deliveredFor` | `Project` | `Customer` | `sv_project` | `ProjectId` | `CustomerId` |
+  | リレーションシップ名 | 元のエンティティ型 | ターゲット エンティティ型 | 元のエンティティ型の列 | ターゲット エンティティ型の列 |
+  | :-- | :-- | :-- | :-- | :-- |
+  | `performedBy` | `Assignment` | `Person` | `PersonId` | `PersonId` |
+  | `deliveredFor` | `Project` | `Customer` | `CustomerId` | `CustomerId` |
 
-これで、エンティティ同士の関係 (リレーション) を辿るためのキー設定が完了しました。  
+これで、エンティティ同士の関係 (リレーション) を辿るための結合列の設定が完了しました。
+
 オントロジーにおけるリレーションの設定での重要ポイントは、以下の 2 点です。
 
 - リレーションシップ名は、AI エージェントがエンティティ同士の関係性を適切に理解できる一意な名称にすること
-- エンティティ同士の関係を設定する際、ターゲットエンティティ側のプロパティにはキープロパティと一致するものを設定すること
+- エンティティ同士の関係を設定する際、ターゲットエンティティ側のプロパティにはキープロパティとなるものを設定すること
 
-リレーショナルデータベース (RDB) の経験がある方は、この設定が `外部キー` (Foreign Key) の設定に似ているということにお気づきかもしれません。確かに似ているのですが、オントロジーのリレーション設定では、RDB の外部キーとはすこし内容が異なります。  
-オントロジーのリレーション設定では、エンティティのキープロパティを指定します。これにより、オントロジーが裏側で使用するグラフモデルも、エンティティ（ノード）をリレーション（エッジ）で紐づける処理が行われます。例えば、`performedBy` リレーションにおける Assignment と Person の設定を見てみると、キープロパティは同じ PersonId になっていません。両方とも PersonId で結んでしまうこと、エッジの始点にあるノード (Assignment) がどのデータを使用しているのか、特定ができなくなってしまいます。そのため、外部キーとは異なり、どちらのエンティティにおいても、自身を一意で識別できるキープロパティで指定がされているわけです。  
+**エンティティ自身のキーと、リレーションの結合列は別です。** 新モデルの直接リレーションでは、外部キーに相当する起点側の列と、終点側のキー列を結びます。例えば `performedBy` は `Assignment.PersonId` と `Person.PersonId` で結合しますが、Assignment 自身を識別するキーは `AssignmentKey` のままです。`AssignmentKey` と `PersonId` は値が異なるため、直接結合には使いません。
+
+REST API では、この結合をテーブル間の TOM `relationship` として定義し、業務上の関係を表す `entityRelationship` の `backingConfiguration.relationship` から参照します。専用のマッピングテーブルを使う形式もありますが、本ワークショップでは使用しません。
+
+これらは、終点側のキーが一意であることを前提とした **N対1** の結合です。起点側の外部キーは重複していて構いません。例えば、複数の Assignment が同じ Person に結び付いても、それぞれの Assignment は `AssignmentKey` で区別されます。終点側のキーの一意性はデータ側で維持してください（`nb_03` はデータ行の一意性検査は行いません）。
 
 ## 5. メタデータを設定する
 
@@ -173,7 +137,7 @@ Microsoft Fabric のオントロジーでは、以下の種類のメタデータ
 | 種類 | 内容 | 付与できる対象 |
 | :-- | :-- | :-- |
 | 説明 (Descriptions) | その概念が何を表すか (1 ~ 3 文) | エンティティ<br/>プロパティ<br/>リレーション |
-| 類義語 (Synonyms) | 別名や略称、業界用語など | エンティティ |
+| 類義語 (Synonyms) | 別名や略称、業界用語など | 新 TMDL ではエンティティ・プロパティ・リレーションに対応。本ラボではエンティティに設定 |
 | 追加のメタデータ (Additional metadata) | 単位や機密区分、業務オーナーなどの情報を Key-Value の形式で表現 (Data quality: Incomplete) | エンティティ<br/>プロパティ<br/>リレーション |
 
 ここでは、`Person` エンティティと `belongsTo` リレーションシップに対して、メタデータの設定を行います。  
@@ -193,7 +157,7 @@ Microsoft Fabric のオントロジーでは、以下の種類のメタデータ
 
 ### belongsTo リレーションシップのメタデータ設定
 
-1. ホーム画面にて、エクスプローラ編集に表示されている `Organization` を選択し、図上にある **belongsTo** を選択します。
+1. ホーム画面にて、エクスプローラ上に表示されている **belongsTo** を選択します。
 2. `メタデータ` 欄にある **編集** を選択します。
 3. 以下の情報を入力し、**更新** を選択します。
   追加のメタデータは設定不要です。
@@ -213,56 +177,80 @@ Microsoft Fabric のオントロジーでは、以下の種類のメタデータ
 - コマンドや REST API などを使用してオントロジーを設定できないの？
 - CI/CD や IaC など、バージョン管理や設定値管理はどうしたらいいの？
 
-Microsoft Fabric では、オントロジーやグラフモデルに関する REST API が提供されています。そのため、本番環境でオントロジーを利用する際は、コードベースの管理や CI/CD といった運用を行うことが可能になっています。  
-
-https://learn.microsoft.com/en-us/rest/api/fabric/ontology/items
-https://learn.microsoft.com/en-us/rest/api/fabric/graphmodel/items
+Microsoft Fabric の [Ontology REST API](https://learn.microsoft.com/en-us/rest/api/fabric/ontology/items) を使用すると、オントロジー定義をコードで管理できます。
 
 ここでは、残りのオントロジー設定を REST API 経由で行います。  
+
+> **対応形式**: 新エクスペリエンスの TMDL（互換性レベル `1000000`）専用です。旧 JSON 形式の自動変換は行いません。互換性レベルの根拠は [公式仕様の database.tmdl](https://learn.microsoft.com/en-us/rest/api/fabric/articles/item-management/definitions/ontology-definition#databasetmdl-database-file) を参照してください。
 
 1. [nb_03_build_ontology.ipynb](./nb_03_build_ontology.ipynb) ファイルをダウンロードします。  
 2. 作成済みのワークスペース画面を開きます。  
 3. ワークスペース画面の上部にある **インポート -> ノートブック -> コンピューターから** を選択します。   
 4. ダウンロードしたノートブックファイルを選択し、**アップロード** します。
 5. 画面左にあるエクスプローラーから、**データ項目の追加 -> OneLake カタログから** を選択します。  
-6. `lh_its_asset_silver` を選択し、**追加** を選択します。
+6. `lh_its_asset_silver` を選択し、**追加** を選択して、既定のレイクハウスに設定します。
 7. 実行言語が **PySpark (Python)**、環境が **ワークスペースの既定値** になっていることを確認し、**すべて実行** を選択します。
 
-ノートブックの実行が完了したら、`ont_its_asset` のオントロジー画面に戻ってみてください。手動で設定したもの以外に、新しくエンティティやリレーションが追加されています。また、グラフモデルについても、ノードとエッジが追加されていることを確認できます。  
+ノートブックの実行が完了したら、`ont_its_asset` のオントロジー画面に戻り、手動で設定したもの以外にエンティティやリレーションが追加されていることを確認してください。ノートブックはグラフモデルへの直接書き込みやデータ取り込みを行いません。続けて[7章](#enable-graph-ja)を実施してください。
 
-### ノートブックが実行したこと
+### 設定
 
-**フェーズ 1: 構造をつくる**
+| 設定 | 既定値・用途 |
+|---|---|
+| `ONTOLOGY_NAME` | `ont_its_asset` |
+| `SILVER_LAKEHOUSE_NAME` | `lh_its_asset_silver`（既定のレイクハウスに設定する） |
+| `SILVER_SCHEMA` | SQL 側のスキーマ名。通常 `dbo`。スキーマ無効レイクハウスでも `None` は指定しない |
+| `APPLY_METADATA` | `True`：説明・類義語・annotation を設定する |
+| `OVERWRITE_EXISTING_METADATA` | `False`：既存の値を保持し、未設定項目だけを補完する |
 
-1. 既存のオントロジー定義を取得する（手動で作った分を壊さない）
-2. まだ無いエンティティ型 12 個を定義に追加する
-3. まだ無い関係型 16 個を定義に追加する
+### ノートブックの処理
 
-**フェーズ 2: 意味を与える**
+| 手順 | 内容 |
+|---|---|
+| 1. アイテムの解決 | Ontology、Workspace、Silver Lakehouse の識別情報・OneLake URL・SQL 分析エンドポイントを取得 |
+| 2. 読み込み | 現在の TMDL と Silver の実スキーマを取得 |
+| 3. 構築 | バインドを検証し、不足する型・関係・プロパティ・キー・メタデータを補完。変更パートを表示 |
+| 4. 更新 | 同時編集がないことを再確認し、変更があれば全パートを一度に送信 |
+| 5. 読み戻し | 必要な17エンティティ型・19関係型とバインド・メタデータを確認 |
 
-4. 各定義の `semanticEnrichment` に、説明・シノニム・追加メタデータを書き込む
-5. 手動で手動設定した内容は上書きしない（`OVERWRITE_EXISTING_METADATA = False`）
+既存パート・接続式・lineageTag・手動設定を保持します。既存のキー・型・結合列が想定と異なる場合は、上書きせず停止します。UI で作成した5型・3関係に不足分を追加するほか、空の新形式のアイテムから全定義を作ることもできます。
 
-**フェーズ 3: 反映する**
+新規テーブルは DirectLake partition を持ち、`let Source = AzureStorage.DataLake("https://<OneLake ホスト>/<Workspace ID>/<Lakehouse ID>", [HierarchicalNavigation=true]) in Source` 形式の共有 M 式で Silver を参照します。一致する UI 作成の接続式を再利用し、なければ `nb03_SilverLakehouse` を追加します。partition には、UI の保存済み定義で確認した `ONT_WorkspaceId`・`ONT_ItemId`・`ONT_ItemKind = Lakehouse`・名前・SQL 接続情報・追加時刻を設定します。`ONT_ItemId` は Lakehouse の ID、`ONT_SqlDatabase` は Lakehouse 名で、SQL エンドポイント ID とは区別します。これらの接続情報は `APPLY_METADATA` に関係なく検証・補完します。
 
-6. Update Item Definition API で、**一度に** 定義を更新する
+プロパティの型は Silver の実スキーマから決定します。説明は `///`、類義語は `synonym`、追加メタデータは `annotation` として出力します。
 
-構造とメタデータを別々に投入せず 1 回の更新にまとめているのは、API 呼び出しを減らすためと、途中で失敗して半端な状態が残るのを避けるためです。
+関係は、起点の外部キー列と終点のキー列を結ぶ TOM `relationship` と、それを参照する `entityRelationship` で表現します。新規 TOM relationship は `isActive: false` とし、複数経路の自動フィルター伝播を避けます。
 
-**フェーズ 4: グラフを構築する**
+### 完了と再実行
 
-7. オントロジーの定義から、グラフのノードとエッジを生成する
-8. グラフにデータを取り込む
+最終セルで次の表示を確認します。
 
-**取り込みには数分かかります。** デモ中にライブで実行する場合は、冒頭の
-`WAIT_FOR_REFRESH = False` にすると完了を待たずに次へ進めます（取り込み自体は
-バックグラウンドで続きます）。事前に一度通しで実行しておくのが確実です。
+```text
+Verified required entity types: 17 / 17
+Verified required relationship types: 19 / 19
+Verified Lakehouse source bindings: 17 / 17
+```
 
-## 7. まとめ
+変更がなければ `No definition changes are needed.` と表示し、更新を送信しません。実行中の UI 編集は避けてください。同時編集検出はロックではありません。
+
+ノートブックを差し替えた場合は、**すべて実行**して古い変数・関数を残さないでください。UI の定義だけを修正した場合は、手順2からやり直します。タイムアウトなどで更新結果が不明な場合は、API の操作状態を確認してから再実行してください。
+
+旧 nb_03 で作成済みの場合も再実行で補修できます。`nb03_SilverSource` を参照し、SQL 接続先と生成時の table lineageTag が一致するテーブルだけを OneLake 接続へ切り替え、欠けた Lakehouse 識別情報を追加します。UI の正常なバインドと既存の時刻は保持し、別 Lakehouse の識別情報や変更済みの接続式は上書きせず停止します。旧共有式は他テーブルが参照している可能性があるため削除しません。読み戻しでは17テーブルすべての接続式と識別情報を検証しますが、UI 表示や MCP の実データ検索成功までは保証しません。
+
+<a id="enable-graph-ja"></a>
+
+## 7. グラフの探索を有効化する（Web画面）
+
+本ワークショップでは、Lab 03 の MCP による実データ検索の準備としてグラフを有効化します。
+
+1. オントロジー画面で、画面の上部にある **グラフの探索** を選択します。
+2. 表示内容を確認し、グラフモデルを有効化します。
+
+## 8. まとめ
 
 このラボでは、作成したシルバー層のレイクハウスに存在するデータを使用して、オントロジーの作成と実データへのバインド設定を行いました。  
 
-これで、オントロジーを介して MCP クライアントにコンテキストを提供する準備が整いました。
+オントロジー定義の更新とグラフの検索準備完了は別です。7章のWeb操作でグラフへの取り込みを完了し、実際の値と関係を検索できることを確認してから MCP に進みます。
 
 次の [Lab 03 - エージェントに問いかける](../03-ask-the-agent/README.md) では、今回作成した `ont_its_asset` オントロジーを使用して、MCP クライアントとの連携をためします。
 
@@ -281,11 +269,11 @@ https://learn.microsoft.com/en-us/rest/api/fabric/graphmodel/items
 
 | 症状 | 原因として多いもの | 対処 |
 |---|---|---|
-| グラフにエンティティ型が出てこない | データバインドが未保存 | エンティティ型を作っただけでは出ない。バインドを保存する |
-| 同上 | エンティティ型キーが未設定 | キーが未定義だとノードを構成できない。2-2 の表のキーを設定する |
-| 同上 | 保存直後で再構築中 | 数分待ってから再確認する |
+| グラフにエンティティ型が出てこない | バインドが未保存、投影対象が未選択、または取り込みが未完了 | バインドを確認し、[7章](#enable-graph-ja)の Manage graph で適格性・選択対象・取り込み完了を確認する |
+| キーを利用する処理が失敗する | 本ラボで想定するキーが未設定 | `nb_03` はキーがない場合に補完する。新モデル自体はキーなしのエンティティもサポートする |
+| インスタンスを参照できない | データソースの権限・可用性・バインドが未確認 | Silver と SQL 分析エンドポイントの状態、接続権限を確認する。グラフの自動再構築を前提にしない |
 | 同上 | シルバー層のテーブルが空 | Step 1 の `nb_02` が正常終了しているか確認する |
-| `CorruptedPayload` | `SILVER_SCHEMA` がレイクハウスの種別と合っていない | スキーマ有効なら `'dbo'`、スキーマ無効（レガシー）なら `None` |
+| `CorruptedPayload` / 定義の検証エラー | TMDL と既存のバインドが不整合 | エラーで指定された型・プロパティ・結合列を確認する。`SILVER_SCHEMA` は SQL 側のスキーマ名（通常 `dbo`） |
 | `Project` / `Assignment` の件数が異様に多い | 時系列バインドを追加してしまった | 本キットは全エンティティ型が静的バインドのみ（2-2 参照）。時系列バインドを削除する |
 | エージェントが取り込み日で「最近入社した人」を答える | `_valid_as_of` をバインドしたまま | プロパティ一覧から削除する（2-2 / `docs/property-binding.md`） |
 
@@ -293,9 +281,9 @@ https://learn.microsoft.com/en-us/rest/api/fabric/graphmodel/items
 
 | 症状 | 原因として多いもの | 対処 |
 |---|---|---|
-| 設定は成功したのに関係が空 | 突き合わせ列が相手のキーと一致していない | 起点・終点とも、相手側エンティティ型のキーと**値が一致する列**を選ぶ（2-3） |
-| `Contextualization sourceKeyRefBindings count (1) must match the number of EntityIdParts (0)` | 起点エンティティ型にキーが未設定（`Assignment` で起きやすい） | 下記「`EntityIdParts (0)` のエラー」を参照 |
-| `Edge source/destination key column count does not match` | 結合列のフィールド名が違う | `sourceNodeKeyColumns` / `destinationNodeKeyColumns` を使う |
+| 設定は成功したのに関係が空 | 結合列または値が一致していない | 4章の表どおりに起点の外部キー列と終点のキー列を結ぶ |
+| `existing TOM relationship columns differ` | 保存済みの結合列が想定と異なる | 4章の表どおりに修正して保存し、手順2から再実行する。`performedBy` は両側 `PersonId` |
+| `keyProperty must be ...` | 想定と異なるキーが設定されている | 下記「キーと既存バインドの検証」を参照 |
 | 線は見えているのに結果が出ない | 関係のデータバインドがずれている | シルバー層のテーブル名や列名を変更していないか確認する |
 
 ### メタデータ
@@ -304,29 +292,34 @@ https://learn.microsoft.com/en-us/rest/api/fabric/graphmodel/items
 |---|---|---|
 | 手動設定したメタデータが消えた | `OVERWRITE_EXISTING_METADATA` が `True` | `False` に戻す（既定は `False`） |
 | 追加メタデータでエラーになる | 同じ対象の中でキーが重複している | エンティティ型・プロパティ・関係型それぞれの単位でキーを一意にする |
-| シノニムを設定できない | プロパティまたは関係型に設定しようとしている | シノニムはエンティティ型のみ対応 |
+| 類義語が追加されない | 手動設定済みの類義語を保持している | 既定では既存の類義語一覧を保持する。意図的に置き換える場合のみ `OVERWRITE_EXISTING_METADATA = True` |
 
-### ノートブック（`nb_03`）とグラフ
+### ノートブック（`nb_03`）
 
 | 症状 | 原因として多いもの | 対処 |
 |---|---|---|
 | 数が 17 / 19 にならない | 手動作成した名前の綴り違い | エンティティ型 `Person` / `Project` / `Customer` / `Organization` / `Assignment`、関係型 `belongsTo` / `performedBy` / `deliveredFor`（大文字小文字も一致させる） |
-| グラフが5ノードのまま増えない | フェーズ4が実行されていない | `BUILD_GRAPH = True` になっているか確認し、「ノード 17 種類 / エッジ 19 種類」の出力を確認する |
-| 同上 | 取り込みが完了していない | 「取り込みが完了しました」まで出たか確認する。`WAIT_FOR_REFRESH = False` なら数分後に再確認 |
-| `GraphNotRefreshable` | グラフが空の状態でリフレッシュしようとした | フェーズ4でグラフ定義を書き込んでから取り込む（ノートブックはこの順で実行する） |
-| MCP でスキーマは見えるがデータ検索が失敗する | グラフの取り込みが未完了 | フェーズ4の出力を確認する。オントロジーとグラフは別アイテムで、スキーマだけ先に見えることがある |
-| 実行が途中で失敗した | — | そのまま再実行してよい。何度実行しても結果は同じになるよう作ってある |
+| `Old JSON ontology detected` | 旧エクスペリエンスのアイテムを指定した | 新エクスペリエンスで作成したオントロジーを使用する。旧形式のパートを混在させない |
+| `The ontology changed after it was read` | 実行中に別の編集が保存された | UI の編集を止め、定義の読み込みからやり直す |
+| `Readback still needs changes` | サービス側で一部の定義・メタデータが保持されなかった | 読み戻した TMDL と表示されたパートを調査する。更新の自動再送はしない |
+| MCP でスキーマは見えるがデータ検索が失敗する | データのアクセス権やバインドが未確認 | 定義更新の完了だけで判断せず、Fabric 側でインスタンス・関係を参照できるか確認する |
+| 実行が途中で失敗した | 検証エラー・通信エラーなど | 原因を修正し、上記「完了と再実行」に従う。更新結果が不明な場合は状態確認を先に行う |
 
-### `EntityIdParts (0)` のエラー
+### キーと既存バインドの検証
 
-関係型は、起点エンティティの**キー**で突き合わせます。UI ではエンティティ型キーを選ばずに保存できてしまうため、キーが0個のエンティティ型が残ることがあります。
-そのエンティティ型を起点にした関係型を追加しようとすると、突き合わせ列は 1 個なのにキーが 0 個で数が合わず、定義の更新が 400 で失敗します。
+新モデルでは `keyProperty` で単一のプロパティをエンティティのキーとして指定します。`nb_03` は未設定の場合だけ `ENTITY_TYPES` に従って補います。例えば Assignment は `AssignmentKey` です。
 
-本キットで起きやすいのは `Assignment` です。エンティティ型キーに `AssignmentKey` を選ぶ手順（2-2）を飛ばすと、この状態になります。
+backing table に列が存在し、entity 側に対応する `property` 宣言がない場合は、実スキーマと列の型を検証してから不足する宣言を補います。既存のテーブル名・列名・接続・メタデータは保持します。
 
-`nb_03_build_ontology.ipynb` は実行時にキーの有無を点検し、未設定のエンティティ型があれば `ENTITY_TYPES` の定義に従ってキーを補ってから関係型を作ります。エラーが出た場合は、ノートブックを最新版に差し替えて再実行してください。UI に戻る必要はありません。
+既存のキーが異なる、必要な backing column がない、実スキーマと型が違う、結合列が異なる場合は書き込み前に停止します。表示された対象を UI で修正してから再実行してください。複合キー・継承・時系列などを追加した独自モデルへの自動変換は行いません。
 
-キーにするプロパティ自体がバインドされていない場合だけは補えないため、その場合はどのプロパティが足りないかを名指ししたメッセージで停止します。
+### ローカルでの検証
+
+Fabric に接続せず、TMDL 生成、既存定義の保持、再実行、REST エラー処理を確認できます。
+
+```powershell
+python -m unittest discover -s .\02-model-and-connect-ontology\tests -v
+```
 
 ---
 
@@ -342,7 +335,7 @@ https://learn.microsoft.com/en-us/rest/api/fabric/graphmodel/items
 | Item | Name | Purpose |
 |---|---|---|
 | Ontology | `ont_its_asset` | Contains the various items created in this workshop |
-| Notebook | `nb_03_build_ontology` | A notebook that creates the ontology and configures the graph model based on the contents of the Delta tables in the Silver-layer Lakehouse. |
+| Notebook | `nb_03_build_ontology` | Configures and validates a new-format TMDL ontology definition from the Silver-layer Delta tables. |
 
 Before proceeding with this lab, you must complete the [settings described in Prerequisites](../README.md#prerequisites). Make sure you have verified them before continuing.
 
@@ -356,13 +349,9 @@ In Microsoft Fabric, working with an ontology requires creating a dedicated item
   Confirm that the workspace name created in step 1 is selected as the location.
 4. Select **Create** to create the ontology.
 
-After the ontology has been created, open the workspace screen. You can confirm that the following three child items have been created and are associated with the `ont_its_asset` item.
+The new-experience ontology stores definitions and bindings to data sources. Graph execution is optional; data is not automatically copied into a graph. In this lab, first build all definitions with the notebook, then follow the [web steps in section 7](#enable-graph-en) to materialize the graph (load data into a graph for querying). Do not manually delete service-managed related items.
 
-- Graph model (ont_its_asset_graph_xxxxxxxx)
-- Lakehouse (ont_its_asset_lh_xxxxxxxx)
-- SQL analytics endpoint (ont_its_asset_lh_xxxxxxxxx)
-
-These are management artifacts required behind the scenes to use the ontology, so be careful not to delete them accidentally.
+Reference: [Ontology overview — Optional graph execution](https://learn.microsoft.com/en-us/fabric/iq/ontology/overview#optional-graph-execution)
 
 Microsoft Fabric ontologies broadly consist of the following four types of definitions:
 
@@ -396,26 +385,21 @@ Therefore, configure properties for the five entities created in the previous se
 1. On the home screen, select `Person` in Explorer, then select **View entity type details**.
 2. Select the **Configuration** tab.
 3. In the `Properties` section, select **Manage property bindings -> Add binding and properties**.
-4. In the `Select binding` section, select **Add data binding -> Lakehouse table**.
-5. Select `lh_its_asset_silver`, then select **Next**.
-6. Select OneLake -> lh_its_asset_silver -> Tables -> dbo, then select **sv_person**.
-7. Select **Entity type key -> Define entity type key**.
-8. From the property list dropdown, select **PersonId**.
-9. Confirm that only `PersonId` appears under the selected properties used as the key, then select **Save**.
-10. Confirm that the Properties section displays the same number of properties as there are columns in the Lakehouse Delta table. (If they are not displayed, stop and repeat the process from step 1.)
-11. Select the trash icon next to the `_valid_as_of` row displayed in the Properties section and **delete the _valid_as_of row**.
-12. Select **Save**.
-13. After confirming that the `Entity type updated successfully` banner appears, select **Cancel**.
-14. Select the **Instances** tab and confirm that the actual data bound to the Person entity is displayed.
-15. Follow the same steps to configure properties and bind actual data for the remaining entities.
-  Refer to the following table for configuration details. For `Project` and `Assignment`, date/time properties appear as candidates for the timestamp column, but because this lab does not define time-series properties, select `None`.
+4. In the `Select binding` section, select **Add** next to the source.
+5. Expand `lh_its_asset_silver`, select dbo -> `sv_person`, then select **Select table**.
+6. Select **Entity type properties**.
+7. Select the trash icon next to `_valid_as_of` and **remove that row**.
+8. Select **Create** and confirm that the settings are saved.
+9. Select **Cancel** to return to Person's properties and confirm that the data binding is displayed.
+10. On the **Instances** tab, confirm that the bound data is visible, then return to **Home**.
+11. Repeat for the remaining entities.
 
-  | Entity | Data binding target | Entity type key | Time-series data -> Timestamp column | Add/remove properties |
-  | :-- | :-- | :-- | :-- | :-- |
-  | `Project` | `sv_project` | `ProjectId` | `None` | (Remove) `_valid_as_of` |
-  | `Customer` | `sv_customer` | `CustomerId` | — | (Remove) `_valid_as_of` |
-  | `Organization` | `sv_organization` | `OrganizationId` | — | (Remove) `_valid_as_of` |
-  | `Assignment` | `sv_assignment` | **`AssignmentKey`** | `None` | **(Remove) `AssignmentId`**<br/>(Remove) `_valid_as_of` |
+  | Entity | Data binding target | Add/remove properties |
+  | :-- | :-- | :-- |
+  | `Project` | `sv_project` | (Remove) `_valid_as_of` |
+  | `Customer` | `sv_customer` | (Remove) `_valid_as_of` |
+  | `Organization` | `sv_organization` | (Remove) `_valid_as_of` |
+  | `Assignment` | `sv_assignment` | **(Remove) `AssignmentId`**<br/>(Remove) `_valid_as_of` |
 
 ### (Explanation 1) The Assignment Entity
 
@@ -439,9 +423,9 @@ This design is based on the principle that the **entity type key should represen
 
 In a Fabric ontology, regular properties and time-series properties are defined separately. **Only the column representing the observation time of a time-series property should be specified as the timestamp column.** The supported source column types are `datetime`, `date`, and `timestamp`, but this does not mean every column of a supported type should be used as the timestamp column.
 
-For example, `Project.StartDate` / `Project.EndDate` and `Assignment.StartDate` / `Assignment.EndDate` are regular properties representing the duration of a project or assignment. Because they do not represent the observation time of a time-series property, do not specify them as the timestamp column; select `None`.
+For example, `Project.StartDate` / `Project.EndDate` and `Assignment.StartDate` / `Assignment.EndDate` are regular properties representing the duration of a project or assignment, not observation times for time-series properties.
 
-When binding time-series data, first complete the static data binding and define the entity type key. Then add a time-series data source to the same entity type, associate entities using a column that matches the static data key, and select the column representing the observation time in the time-series data as the timestamp column. OneLake or Eventhouse tables can be used for time-series data.
+In the new TMDL format, these ordinary date properties use `dataType: dateTime`. Time-series properties instead use a `TimeSeries<T>` type and a time-series backing configuration. `nb_03` reads the actual Silver schema to determine each ordinary property's type.
 
 The five entities created through the GUI steps in this lab bind only static data, so you will not add time-series properties or time-series bindings.
 
@@ -468,29 +452,31 @@ In this section, you will configure relationship information between the created
 4. From the `Target entity type` dropdown, select **Organization**.
 5. Select **Create**.
 6. Confirm that the `belongsTo` relationship has been created and that the Person and Organization entities are connected.
-7. Select **belongsTo**.
-8. Under `Mapping table`, select **Browse available sources -> sv_person**.
-  (If sv_person does not appear in the list, select it through Browse available sources.)
-9. Under `Matched Person: PersonId`, select **PersonId**.
-10. Under `Matched Organization: OrganizationId`, select **OrganizationId**.
+7. Select **belongsTo** on the arrow between Person and Organization.
+8. Turn off **Use mapping table?**.
+9. Under the origin entity's **Property**, select **OrganizationId**.
+10. Under the target entity's **Property**, select **OrganizationId**.
 11. Select **Save**.
 12. After confirming that the `Relationship type updated successfully` banner appears, select **Home**.
 13. Follow the same steps to configure two relationships.
   Refer to the following table for configuration details.
 
-  | Relationship name | Source entity type | Target entity type | Mapping table | Source entity type column | Target entity type column |
-  | :-- | :-- | :-- | :-- | :-- | :-- |
-  | `performedBy` | `Assignment` | `Person` | `sv_assignment` | `AssignmentKey` | `PersonId` |
-  | `deliveredFor` | `Project` | `Customer` | `sv_project` | `ProjectId` | `CustomerId` |
+  | Relationship name | Source entity type | Target entity type | Source entity type column | Target entity type column |
+  | :-- | :-- | :-- | :-- | :-- |
+  | `performedBy` | `Assignment` | `Person` | `PersonId` | `PersonId` |
+  | `deliveredFor` | `Project` | `Customer` | `CustomerId` | `CustomerId` |
 
-You have now completed the key configuration required to traverse the relationships between entities.
+You have now configured the join columns needed to traverse relationships between entities.
 The following two points are important when configuring ontology relationships:
 
 - Give each relationship a unique name that allows an AI agent to understand the relationship between entities correctly
 - When defining a relationship between entities, set the target entity's property to one that matches its key property
 
-If you have experience with relational databases (RDBs), you may notice that this configuration resembles a `foreign key` setting. Although they are similar, ontology relationship configuration differs somewhat from an RDB foreign key.
-Ontology relationship configuration specifies the key property of each entity. This enables the graph model used behind the scenes by the ontology to link entities (nodes) through relationships (edges). For example, in the Assignment and Person configuration for the `performedBy` relationship, the key properties are not both the same PersonId. If both sides were joined using PersonId, it would be impossible to identify which data is used by the node at the start of the edge (Assignment). Therefore, unlike a foreign key, each entity is specified using a key property that uniquely identifies that entity itself.
+**An entity's identity key and a relationship's join columns serve different purposes.** A direct relationship in the new model joins the origin's foreign-key column to the target's key column. For example, `performedBy` joins `Assignment.PersonId` to `Person.PersonId`, while Assignment's own identity key remains `AssignmentKey`. Do not directly join `AssignmentKey` to `PersonId`, because their values differ.
+
+The REST definition represents this join as a TOM table `relationship`, referenced by the business-level `entityRelationship` through `backingConfiguration.relationship`. A separate mapping-table form is also available, but this workshop does not use it.
+
+These are **many-to-one** joins, assuming that the target key is unique. The origin's foreign-key values may repeat. For example, multiple Assignments can reference the same Person while remaining distinct through `AssignmentKey`. Maintain target-key uniqueness in the data; `nb_03` does not scan data rows to check uniqueness.
 
 ## 5. Configure Metadata
 
@@ -503,7 +489,7 @@ Microsoft Fabric ontologies support the following types of metadata.
 | Type | Description | Applicable to |
 | :-- | :-- | :-- |
 | Descriptions | What the concept represents (1–3 sentences) | Entity<br/>Property<br/>Relationship |
-| Synonyms | Alternate names, abbreviations, industry terms, and so on | Entity |
+| Synonyms | Alternate names, abbreviations, industry terms, and so on | New TMDL supports entities, properties, and relationships. This lab configures entity synonyms |
 | Additional metadata | Information such as units, sensitivity classifications, and business owners, represented as Key-Value pairs (Data quality: Incomplete) | Entity<br/>Property<br/>Relationship |
 
 Here, you will configure metadata for the `Person` entity and the `belongsTo` relationship.
@@ -543,56 +529,92 @@ Up to this point, you have configured the ontology's various elements (entities,
 - Can an ontology be configured using commands, REST APIs, or other methods?
 - How should version control and configuration management be handled with CI/CD or IaC?
 
-Microsoft Fabric provides REST APIs for ontologies and graph models. Therefore, when using an ontology in a production environment, you can adopt practices such as code-based management and CI/CD.
-
-https://learn.microsoft.com/en-us/rest/api/fabric/ontology/items
-https://learn.microsoft.com/en-us/rest/api/fabric/graphmodel/items
+The Microsoft Fabric [Ontology REST API](https://learn.microsoft.com/en-us/rest/api/fabric/ontology/items) lets you manage ontology definitions as code.
 
 Here, you will complete the remaining ontology configuration through the REST API.
+
+> **Supported format**: New-experience TMDL at compatibility level `1000000` only. Old JSON-format items are not converted. See the [official database.tmdl specification](https://learn.microsoft.com/en-us/rest/api/fabric/articles/item-management/definitions/ontology-definition#databasetmdl-database-file) for the compatibility-level requirement.
 
 1. Download the [nb_03_build_ontology.ipynb](./nb_03_build_ontology.ipynb) file.
 2. Open the workspace you created.
 3. At the top of the workspace screen, select **Import -> Notebook -> From this computer**.
 4. Select the downloaded notebook file and **upload** it.
 5. In Explorer on the left side of the screen, select **Add data item -> From OneLake catalog**.
-6. Select `lh_its_asset_silver`, then select **Add**.
+6. Select `lh_its_asset_silver`, select **Add**, and make it the default lakehouse.
 7. Confirm that the run language is **PySpark (Python)** and the environment is **Workspace default**, then select **Run all**.
 
-When notebook execution is complete, return to the `ont_its_asset` ontology screen. In addition to the items you configured manually, new entities and relationships have been added. You can also confirm that nodes and edges have been added to the graph model.
+After running the notebook, return to `ont_its_asset` and confirm that entities and relationships have been added alongside those configured manually. The notebook does not write directly to the graph model or trigger graph ingestion. Continue with [section 7](#enable-graph-en).
+
+### Configuration
+
+| Setting | Default / purpose |
+|---|---|
+| `ONTOLOGY_NAME` | `ont_its_asset` |
+| `SILVER_LAKEHOUSE_NAME` | `lh_its_asset_silver` (attach as the default lakehouse) |
+| `SILVER_SCHEMA` | SQL-side schema, normally `dbo`. Do not use `None`, even for schema-disabled lakehouses |
+| `APPLY_METADATA` | `True`: configure descriptions, synonyms, and annotations |
+| `OVERWRITE_EXISTING_METADATA` | `False`: retain existing values and fill missing metadata only |
 
 ### What the Notebook Does
 
-**Phase 1: Build the Structure**
+| Step | Action |
+|---|---|
+| 1. Resolve items | Retrieve the Ontology, workspace and Silver Lakehouse identities, OneLake URL, and SQL analytics endpoint |
+| 2. Read | Retrieve the current TMDL and actual Silver schemas |
+| 3. Build | Validate bindings, fill missing types, relationships, properties, keys, and metadata, and list changed parts |
+| 4. Update | Recheck for concurrent edits and submit all parts in one call only when changes exist |
+| 5. Read back | Verify the required 17 entity types, 19 relationships, bindings, and metadata |
 
-1. Retrieve the existing ontology definition (without breaking what was created manually)
-2. Add the 12 entity types that do not yet exist to the definition
-3. Add the 16 relationship types that do not yet exist to the definition
+Existing parts, connection expressions, lineage tags, and manual settings are retained. Incompatible keys, types, or join columns stop the update rather than being overwritten. The notebook supplements the five types and three relationships created in the UI, or builds all definitions in an empty new-format item.
 
-**Phase 2: Add Meaning**
+New tables use DirectLake partitions and a shared M expression of the form `let Source = AzureStorage.DataLake("https://<OneLake host>/<workspace ID>/<Lakehouse ID>", [HierarchicalNavigation=true]) in Source`. A matching UI-authored expression is reused; otherwise, `nb03_SilverLakehouse` is added. Partitions receive the source annotations observed in the saved UI definition: `ONT_WorkspaceId`, `ONT_ItemId`, `ONT_ItemKind = Lakehouse`, names, SQL connection details, and a timestamp. `ONT_ItemId` is the Lakehouse ID and `ONT_SqlDatabase` is the Lakehouse name, not the SQL endpoint ID. Source metadata is validated and supplemented regardless of `APPLY_METADATA`.
 
-4. Write descriptions, synonyms, and additional metadata to each definition's `semanticEnrichment`
-5. Do not overwrite content configured manually (`OVERWRITE_EXISTING_METADATA = False`)
+Property types come from the actual Silver schema. Descriptions use `///`, synonyms use `synonym`, and additional metadata uses `annotation`.
 
-**Phase 3: Apply the Changes**
+Relationships consist of a TOM `relationship` joining the origin's foreign-key column to the target's key column, referenced by an `entityRelationship`. New TOM relationships use `isActive: false` to avoid automatic filter propagation along multiple paths.
 
-6. Update the definition **all at once** using the Update Item Definition API
+### Completion and Reruns
 
-The structure and metadata are combined into a single update rather than submitted separately to reduce API calls and avoid leaving a partially configured state if the process fails midway.
+Confirm that the final cell displays:
 
-**Phase 4: Build the Graph**
+```text
+Verified required entity types: 17 / 17
+Verified required relationship types: 19 / 19
+Verified Lakehouse source bindings: 17 / 17
+```
 
-7. Generate graph nodes and edges from the ontology definition
-8. Load data into the graph
+When nothing changes, the notebook prints `No definition changes are needed.` and skips the update. Avoid UI edits during execution; the concurrent-edit check is not a lock.
 
-**Loading takes several minutes.** When running it live during a demo, set
-`WAIT_FOR_REFRESH = False` at the beginning to proceed without waiting for completion (the load itself
-continues in the background). The safest approach is to run the notebook through once in advance.
+After replacing the notebook, use **Run all** to redefine its functions and variables. If only the UI definition changed, rerun from step 2. If a timeout or another error leaves the update outcome unknown, check the API operation status before rerunning.
 
-## 7. Summary
+Rerunning also repairs tables created by the previous nb_03: only tables referencing `nb03_SilverSource` with the expected SQL source and generated table lineage tag are switched to OneLake and receive missing Lakehouse identification metadata. Valid UI bindings and existing timestamps are preserved. Conflicting Lakehouse identifiers or modified source expressions stop the update rather than being overwritten. The legacy shared expression is retained because other tables might reference it. Readback checks all 17 tables' expressions and source identities; it does not guarantee UI rendering or successful MCP data queries.
+
+<a id="enable-graph-en"></a>
+
+## 7. Enable Graph Exploration in the Web UI
+
+Complete `nb_03` and verify its 17 entity types, 19 relationships, and Lakehouse bindings first. This workshop enables the graph before Lab 03's MCP data searches. **Opening the explorer alone is insufficient: select the scope and finish loading the data.**
+
+> **Product capability versus lab procedure:** The official documentation describes graph as optional for the new ontology. The Ontology MCP prerequisites do not explicitly require it either. These steps prepare this lab's graph searches; they do not establish a universal graph requirement for every MCP data query.
+
+1. Reopen `ont_its_asset` in Fabric and confirm that the notebook's added types appear.
+2. Select **Manage graph** on the Home ribbon.
+3. In **Configure Graph**, check **Eligible** status and select all 17 lab entity types. Expand them and check that the preview includes the 19 relationships. For an existing graph, use **Select entities** to revise the scope.
+4. Select **Continue** and review **Projection Summary** for omissions.
+5. Select **Materialize** and wait for ingestion to finish. Depending on data volume, this can take minutes to hours.
+6. Open **Explore graph**. Inspect **Components**, use **Add a node** to select `Person`, and expand related nodes. Select **Run** and confirm that results contain actual employee values and relationships, not just type names, before starting Lab 03.
+
+**Ineligible types:** Hover over `Ineligible` for the reason. Correct missing keys or bindings. Graph projection supports Delta tables in Lakehouses or Mirrored Databases; types with multiple backing tables are among its limitations. Do not assume all demos will work with types omitted.
+
+**Later changes:** Revisit **Manage graph** after adding types or relationships. After changing Silver data rows, open the associated graph model's **… → Schedule → Refresh now** in the workspace and verify the results. Rerunning `nb_03` alone does not confirm that graph data is current.
+
+Official references, checked October 5, 2026: [Graph materialization, exploration, refresh, and limitations](https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-use-ontology-graph) and [Ontology MCP prerequisites and connection](https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-use-ontology-mcp-server).
+
+## 8. Summary
 
 In this lab, you used data in the Silver-layer Lakehouse you created to build an ontology and configure bindings to actual data.
 
-You are now ready to provide context to an MCP client through the ontology.
+Updating the ontology definition and preparing graph queries are separate steps. Complete the web-based ingestion in section 7 and confirm that actual values and relationships are queryable before proceeding to MCP.
 
 In the next section, [Lab 03 - Ask the Agent](../03-ask-the-agent/README.md), you will use the `ont_its_asset` ontology created in this lab to try integration with an MCP client.
 
@@ -611,11 +633,11 @@ In the next section, [Lab 03 - Ask the Agent](../03-ask-the-agent/README.md), yo
 
 | Symptom | Common cause | Resolution |
 |---|---|---|
-| An entity type does not appear in the graph | The data binding has not been saved | Creating the entity type alone is not enough. Save the binding |
-| Same as above | The entity type key has not been set | A node cannot be constructed without a defined key. Set the key shown in the table in 2-2 |
-| Same as above | The graph is rebuilding immediately after saving | Wait several minutes, then check again |
+| An entity type does not appear in the graph | Unsaved binding, missing projection selection, or incomplete ingestion | Check the binding, then verify eligibility, scope, and ingestion completion through Manage graph in [section 7](#enable-graph-en) |
+| A key-dependent operation fails | The key expected by this lab has not been set | `nb_03` fills missing keys. The new model itself also supports keyless entities |
+| Instances cannot be queried | Source permissions, availability, or bindings have not been checked | Check Silver, its SQL analytics endpoint, and connection permissions; do not assume an automatic graph rebuild |
 | Same as above | The Silver-layer table is empty | Confirm that `nb_02` in Step 1 completed successfully |
-| `CorruptedPayload` | `SILVER_SCHEMA` does not match the Lakehouse type | Use `'dbo'` when schemas are enabled, or `None` when schemas are disabled (legacy) |
+| `CorruptedPayload` / definition validation error | TMDL and existing bindings are inconsistent | Inspect the named type, property, or join column. `SILVER_SCHEMA` is the SQL-side schema, normally `dbo` |
 | The number of `Project` / `Assignment` records is unusually large | A time-series binding was added | This kit uses static bindings only for every entity type (see 2-2). Remove the time-series binding |
 | The agent answers "people who joined recently" based on the ingestion date | `_valid_as_of` is still bound | Remove it from the property list (2-2 / `docs/property-binding.md`) |
 
@@ -623,9 +645,9 @@ In the next section, [Lab 03 - Ask the Agent](../03-ask-the-agent/README.md), yo
 
 | Symptom | Common cause | Resolution |
 |---|---|---|
-| The relationship is empty even though configuration succeeded | The matching column does not correspond to the other entity's key | For both the source and destination, select columns whose **values match** the key of the entity on the other side (2-3) |
-| `Contextualization sourceKeyRefBindings count (1) must match the number of EntityIdParts (0)` | The source entity type has no key configured (common with `Assignment`) | See "`EntityIdParts (0)` Error" below |
-| `Edge source/destination key column count does not match` | The join-column field names are incorrect | Use `sourceNodeKeyColumns` / `destinationNodeKeyColumns` |
+| The relationship is empty even though configuration succeeded | Join columns or their values do not match | Join the origin's foreign-key column to the target's key column as shown in section 4 |
+| `existing TOM relationship columns differ` | Saved join columns differ from the expected mapping | Correct and save them as shown in section 4, then rerun from step 2. `performedBy` uses `PersonId` on both sides |
+| `keyProperty must be ...` | A different entity key is configured | See "Key and Existing Binding Validation" below |
 | Lines are visible, but no results are returned | The relationship data binding is misaligned | Confirm that the Silver-layer table or column names have not been changed |
 
 ### Metadata
@@ -634,26 +656,31 @@ In the next section, [Lab 03 - Ask the Agent](../03-ask-the-agent/README.md), yo
 |---|---|---|
 | Manually configured metadata disappeared | `OVERWRITE_EXISTING_METADATA` is `True` | Change it back to `False` (the default is `False`) |
 | Additional metadata produces an error | A key is duplicated within the same target | Make keys unique within each entity type, property, and relationship type |
-| Unable to configure synonyms | You are attempting to configure them on a property or relationship type | Synonyms are supported only for entity types |
+| Synonyms are not added | A manually configured synonym list is being retained | Existing lists are preserved by default. Set `OVERWRITE_EXISTING_METADATA = True` only to replace them intentionally |
 
-### Notebook (`nb_03`) and Graph
+### Notebook (`nb_03`)
 
 | Symptom | Common cause | Resolution |
 |---|---|---|
 | The counts do not reach 17 / 19 | A manually created name is misspelled | Match the capitalization of entity types `Person` / `Project` / `Customer` / `Organization` / `Assignment` and relationship types `belongsTo` / `performedBy` / `deliveredFor` |
-| The graph remains at five nodes and does not grow | Phase 4 was not executed | Confirm that `BUILD_GRAPH = True` and check for the output "17 node types / 19 edge types" |
-| Same as above | Loading has not completed | Confirm that "Loading completed" was displayed. If `WAIT_FOR_REFRESH = False`, check again after several minutes |
-| `GraphNotRefreshable` | An attempt was made to refresh an empty graph | Write the graph definition in Phase 4 before loading it (the notebook runs in this order) |
-| The schema is visible through MCP, but data search fails | Graph loading has not completed | Check the Phase 4 output. The ontology and graph are separate items, so the schema may become visible first |
-| Execution failed midway | — | You can rerun it as-is. It is designed to produce the same result no matter how many times it runs |
+| `Old JSON ontology detected` | The selected item uses the old experience | Use an ontology created with the new experience. Do not mix old-format parts into it |
+| `The ontology changed after it was read` | Another edit was saved while the notebook was running | Stop UI edits and rerun from the definition-reading step |
+| `Readback still needs changes` | The service did not retain some definition or metadata content | Inspect the returned TMDL and listed parts. Do not automatically resubmit the update |
+| The schema is visible through MCP, but data search fails | Data permissions or bindings have not been checked | Do not rely only on a successful definition update. Check access to entity instances and relationships in Fabric |
+| Execution failed midway | Validation, communication, or another error | Fix the cause and follow "Completion and Reruns" above. If the update outcome is unknown, check its status first |
 
-### `EntityIdParts (0)` Error
+### Key and Existing Binding Validation
 
-Relationship types match against the source entity's **key**. Because the UI allows you to save without selecting an entity type key, an entity type with zero keys may remain.
-If you try to add a relationship type whose source is that entity type, the definition update fails with a 400 error because there is one matching column but zero keys, so the counts do not match.
+The new model uses `keyProperty` to name a single entity identity property. `nb_03` fills it from `ENTITY_TYPES` only when it is absent. For example, Assignment uses `AssignmentKey`.
 
-In this kit, this most commonly occurs with `Assignment`. Skipping the step in 2-2 that selects `AssignmentKey` as the entity type key causes this state.
+When a backing column exists but the corresponding entity `property` declaration is absent, the notebook checks its type against the source schema and adds the missing declaration. Existing table names, column names, connections, and metadata are retained.
 
-At runtime, `nb_03_build_ontology.ipynb` checks whether keys are present. If an entity type has no configured key, it supplements the key according to the `ENTITY_TYPES` definition before creating relationship types. If you encounter this error, replace the notebook with the latest version and rerun it. You do not need to return to the UI.
+The notebook stops before writing if an existing key differs, a required backing column is missing, types do not match the source schema, or join columns differ. Correct the named object in the UI and rerun. It does not automatically convert customized models with composite keys, inheritance, or time-series extensions.
 
-The only case it cannot correct is when the property to be used as the key is not itself bound. In that case, it stops with a message explicitly naming the missing property.
+### Local Validation
+
+Check TMDL generation, preservation of existing definitions, reruns, and REST error handling without connecting to Fabric:
+
+```powershell
+python -m unittest discover -s .\02-model-and-connect-ontology\tests -v
+```
