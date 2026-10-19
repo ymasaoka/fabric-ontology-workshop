@@ -128,63 +128,107 @@ fabric-iq-ontology-its-asset のオントロジーに接続して、エンティ
 
 ### 3-3. 提案準備（類似案件と有識者検索）
 
+大和精密工業様の「技能継承ナレッジ検索を設計ナレッジへ広げ、全社展開する」という相談に向けて、「設計レビュー支援」の案件から提案材料を集めます。
+
+#### 案件情報の検索
+
 ```
-大和精密工業様から、技能継承のためのナレッジ検索の仕組みを、設計ナレッジまで広げて全社に展開したい、と相談を受けました。提案の準備を手伝って。
-進め方としては、次の4つを順番確認して。それぞれ「全部で何件あるか」を先に教えてから、中身を出して。
-
-1. 他のお客様で、似たテーマの案件が過去にどれだけあるか。
-  お客様名・案件名・いまどうなっているか（完了／進行中／これから）を一覧にして。
-  まだ始まっていない案件は、実績とは分けて「参考」として扱うこと。
-
-2. 1で挙げた案件のうち、完了と進行中のものすべてについて、そこで作られた資料が全部で何件あるか。
-  他の案件でも使い回せそうなものを、使い回しやすさの評価とあわせて挙げて。使いにくいものは件数だけで構わない。
-
-3. 同じ案件について、現場が書き残した気づき・反省点・うまくいったやり方が全部で何件あるか。
-  そのうえで、特に参考になるものを挙げて。
-
-4. 同じ案件について、責任者や技術リーダーを務めた人が全部で何人いるか。
-  そのうえで、氏名・役職・どの案件で何を担当したかを表にして。
-
-最後に、提案準備として最初にやるべきことをまとめて。
+大和精密工業様への提案準備として、ほかのお客様の「設計レビュー支援」の案件を探して。
+件数を先に教えてから、お客様名・案件名・完了／進行中／計画中を一覧にして。まだ始まっていない案件は「参考」として扱って。
+今回は案件の一覧だけで構いません。
 ```
 
-<u>**成功条件**</u>  
+**期待値：2 件（完了 1 件、進行中 1 件）。**
 
-プロンプトで提示した 4 点についての回答が得られており、オントロジー経由で取得した情報が根拠として付加されていること。  
-
-| # | 求めたもの | 回答 |
+| お客様 | 案件名 | 状態 |
 | --- | --- | --- |
-| 1 | 他のお客様での類似案件 | `8 件`（実績: 7 件、参考: 1 件） |
-| 2 | 完了・進行中案件で作成された資料 | `20 件`（高: 5 件、中: 9 件、低: 6 件） |
-| 3 | 登録済みの気づき・反省点・成功パターン | `21 件`（BestPractice: 9 件、LessonsLearned: 7 件、Issue: 5 件） |
-| 4 | 責任者・技術リーダー | `12 名`（担当実績: 14 件、複数案件の担当者: 2 名） |
-| 5 | 提案の初動プラン | 提案に向けたプランが説明されていること |
+| 陸奥製鋼 | 生成AIによる設計レビュー支援 | 完了 |
+| 東海マテリアル | 生成AIによる設計レビュー支援 | 進行中 |
 
-案件テーマとしては、「技能継承ナレッジ検索」「設計レビュー支援」「保全ナレッジ検索」の 3 種類があります。案件名にこれらが含まれていることを確認します。
-相談内容に「全社展開したい」と書いてあるので、生成 AI プラットフォームの全社展開案件（北斗重工業・信州電子工業）を含めてくるのは、オントロジーを使用するメリットを得られている良い読み取りになります。  
-
-<u>**確認ポイント**</u>  
-
-- `Project` → `Deliverable` / `Knowledge` / `Person` のリレーションを辿り、「誰に聞けばよいか」という暗黙知が構造化されて出力されるか
-- 4 つの依頼内容それぞれが適切に集計されているか (冒頭の依頼で検索範囲の母数を固定していないか)
-- これから始まる案件を実績として扱っていないか
-
-#### 追い込み質問（相談先の提案）
+#### 陸奥製鋼の案件情報を確認
 
 ```
-いま挙げた類似案件それぞれについて、PM・アーキテクト・テックリードを務めた人を一覧で出して。
-そのうえで、2件以上に名前が出てくる人を教えて。
-案件が完了済みか進行中かも添えること。
+陸奥製鋼様の「生成AIによる設計レビュー支援」で作られた資料は全部で何件ありますか。
+登録されている使い回しやすさの高・中・低の評価別件数も先に教えてから、高・中の資料名と評価を一覧にして。低は件数だけで構いません。
+今回はこの案件の資料だけでよく、本文までは調べなくていいです。
 ```
 
-先に一覧を出させてから絞り込みを行うようにしているのには、理由があります。いきなり「複数案件でリードを務めたことは誰か」と聞くと、直前の回答で名前を挙げた人の中からしか探さない場合があります。  
-案件ベースでの一覧を経由させることで、もれなく情報をオントロジー経由で取得することができます。  
+**期待値：4 件（高 1 件、中 2 件、低 1 件）。** 高・中の 3 件が一覧に出ます。
 
-<u>**成功条件**</u>  
+```
+陸奥製鋼様の「生成AIによる設計レビュー支援」で、現場が書き残した気づき・反省点・うまくいったやり方は全部で何件ありますか。
+総件数と種類別件数を先に教えてから、すべての記録のタイトルと要点を1行ずつ出して。
+今回はこの案件の記録だけで構いません。
+```
 
-_2 名（佐藤 光・後藤 陽子）_ の回答が得られること。
-2 名とも、完了案件と進行中案件の両方でリードを務めています。過去の実績を語りつつ、かつ今の現場感も持ち合わせている、という並びです。  
-場合によっては、`坂本 直樹` も回答に含まれる場合があります。ただし、彼の持つ陸奥製鋼の案件は計画中でありまだ開始されていないので、実績として弱いことが添えられていれば問題ありません。
+**期待値：4 件（気づき・学び〈LessonsLearned〉1 件、反省点・課題〈Issue〉2 件、うまくいったやり方〈BestPractice〉1 件）。** 全 4 件のタイトルと要点が出ます。日本語の分類名は回答によって変わるため、登録されている分類と件数で確認します。
+
+```
+陸奥製鋼様の「生成AIによる設計レビュー支援」で、プロジェクトマネージャー、アーキテクト、テックリードを務めた人を教えて。
+人数を先に出してから、氏名・役職・この案件での担当を一覧にして。
+今回はこの案件の担当者だけで構いません。
+```
+
+**期待値：3 名。** 松本 麻衣（テックリード）、後藤 陽子（アーキテクト）、松本 光（PM）が出ます。
+
+#### 東海マテリアルの案件情報を確認
+
+```
+東海マテリアル様の「生成AIによる設計レビュー支援」で作られた資料は全部で何件ありますか。
+登録されている使い回しやすさの高・中・低の評価別件数も先に教えてから、高・中の資料名と評価を一覧にして。低は件数だけで構いません。
+今回はこの案件の資料だけでよく、本文までは調べなくていいです。
+```
+
+**期待値：2 件（高 1 件、中 0 件、低 1 件）。** 高の 1 件が一覧に出ます。
+
+```
+東海マテリアル様の「生成AIによる設計レビュー支援」で、現場が書き残した気づき・反省点・うまくいったやり方は全部で何件ありますか。
+総件数と種類別件数を先に教えてから、すべての記録のタイトルと要点を1行ずつ出して。
+今回はこの案件の記録だけで構いません。
+```
+
+**期待値：5 件（気づき・学び〈LessonsLearned〉3 件、反省点・課題〈Issue〉1 件、うまくいったやり方〈BestPractice〉1 件）。** 全 5 件のタイトルと要点が出ます。
+
+```
+東海マテリアル様の「生成AIによる設計レビュー支援」で、プロジェクトマネージャー、アーキテクト、テックリードを務めた人を教えて。
+人数を先に出してから、氏名・役職・この案件での担当を一覧にして。
+今回はこの案件の担当者だけで構いません。
+```
+
+**期待値：2 名。** 後藤 陽子（PM）、坂本 直樹（アーキテクト）が出ます。
+
+**結果をまとめる**
+
+```
+ここまでの回答だけを使って、案件の総件数と状態別件数、資料の総件数と評価別件数、現場の記録の総件数と種類別件数、担当者の実人数と延べ担当件数を先にまとめて。同じ案件や人は二重に数えないで。
+そのあと、使い回せそうな資料、特に参考になる現場の気づき、相談先を、案件名とともに一覧にして。資料は高・中のものをすべて、相談先は氏名・役職・案件での担当を出して。
+大和精密工業様の技能継承・設計ナレッジ検索の全社展開に向けた初動プランを5項目以内で提案して。
+未開始の案件は「参考」として実績と分けて。確認漏れがあれば明記し、合計は未確定にして。新しく調べ直さなくていいです。
+```
+
+**期待値：**
+
+| 確認項目 | 期待する回答 |
+| --- | --- |
+| 案件 | 2 件（完了 1 件、進行中 1 件） |
+| 資料 | 6 件（高 2 件、中 2 件、低 2 件）。再利用候補の一覧は高・中の 4 件 |
+| 現場の記録 | 9 件（LessonsLearned 4 件、Issue 3 件、BestPractice 2 件）と、参考になる記録の活用方法 |
+| 相談先 | 実人数 4 名、延べ担当 5 件と、全員の氏名・役職・担当 |
+| 初動プラン | 資料・現場の記録・相談先を根拠にした 5 項目以内の提案 |
+
+<u>**確認ポイント**</u>
+
+- 資料・現場の記録・担当者が、それぞれの案件と結び付いているか
+- 対象の 2 案件を集計し、両方に参加した人を二重に数えていないか
+
+**追い込み質問（相談先の提案）**
+
+```
+ここまでの回答だけを使って、案件ごとに責任者や技術リーダーを並べてから、2件以上を担当した人を教えて。
+各案件が完了済みか進行中かも添えて。新しく調べ直さなくていいです。
+```
+
+**期待値：1 名（後藤 陽子）。** 陸奥製鋼の完了案件でアーキテクト、東海マテリアルの進行中案件で PM を担当しています。
 
 ### 3-4. チーム編成（Opportunityベース）
 
@@ -553,67 +597,109 @@ For the bundled sample data, the result is **1 person (松本 麻衣)**. 石川 
 
 ### 3-3. Proposal Preparation (Similar Projects and Expert Search)
 
+Gather proposal material from design review support projects for 大和精密工業's request to expand skills-transfer knowledge search to design knowledge and roll it out company-wide.
+
+**Send the prompts below in order, one at a time in the same conversation.** Expected results refer to the bundled `2026-08-05` sample data.
+
+**Find projects**
+
 ```
-大和精密工業 has asked us about expanding its knowledge-search system for skills transfer to include design knowledge and rolling it out across the entire company. Help me prepare a proposal.
-Proceed by checking the following four items in order. For each item, first tell me the total number of records, and then show the details.
-
-1. How many projects with similar themes have there been for other customers?
-  List the customer name, project name, and current status (completed/in progress/upcoming).
-  Separate projects that have not yet started from actual experience and treat them as "reference" projects.
-
-2. Among the projects listed in item 1, how many deliverables in total were created for all completed and in-progress projects?
-  List those that appear reusable for other projects, together with an assessment of how easy they are to reuse. For those that are difficult to reuse, only the count is needed.
-
-3. For the same projects, how many observations, lessons learned, and successful approaches were recorded by the people working in the field?
-  Then list the ones that are especially useful.
-
-4. For the same projects, how many people in total served as the person responsible or technical lead?
-  Then provide a table with their names, job titles, and what they were responsible for on each project.
-
-Finally, summarize the first actions we should take to prepare the proposal.
-
-When searching the ontology, use Japanese search terms and match the Japanese values stored in OneLake. Provide the final answer in English.
+I'm preparing a proposal for 大和精密工業. Find projects for other customers about "設計レビュー支援" (design review support).
+First give the count, then list the customer, project name, and whether it is completed, in progress, or planned. Treat projects not yet started as "reference."
+Only list projects for now. Answer in English.
 ```
 
-<u>**Success criteria**</u>
+**Expected: 2 projects (1 completed, 1 in progress).**
 
-The response addresses the four points presented in the prompt and includes supporting information obtained through the ontology.
-
-| # | Requested item | Answer |
+| Customer | Project name | Status |
 | --- | --- | --- |
-| 1 | Similar projects for other customers | `8 projects` (actual experience: 7, reference: 1) |
-| 2 | Deliverables created in completed and in-progress projects | `20 deliverables` (High: 5, Medium: 9, Low: 6) |
-| 3 | Recorded observations, lessons learned, and successful patterns | `21 records` (BestPractice: 9, LessonsLearned: 7, Issue: 5) |
-| 4 | Persons responsible and technical leads | `12 people` (role assignments: 14, people assigned to multiple projects: 2) |
-| 5 | Initial proposal plan | A plan for preparing the proposal is explained |
+| 陸奥製鋼 | 生成AIによる設計レビュー支援 | Completed |
+| 東海マテリアル | 生成AIによる設計レビュー支援 | In progress |
 
-There are three project themes: "技能継承ナレッジ検索", "設計レビュー支援", and "保全ナレッジ検索". Confirm that project names include these phrases.
-Because the request says that the customer wants to "roll it out across the entire company," including enterprise-wide generative AI platform rollout projects (北斗重工業 and 信州電子工業) is a good interpretation that demonstrates the benefit of using the ontology.
+**Check 陸奥製鋼's project**
+
+```
+How many documents were created for 陸奥製鋼's "生成AIによる設計レビュー支援"?
+First give the recorded High, Medium, and Low reuse-rating counts, then list High and Medium document names and ratings. For Low, just give the count.
+Only check this project's documents; there is no need to open their contents. Answer in English.
+```
+
+**Expected: 4 documents (1 High, 2 Medium, 1 Low).** The list contains the 3 High and Medium documents.
+
+```
+How many observations, lessons learned, and successful approaches did the team record for 陸奥製鋼's "生成AIによる設計レビュー支援"?
+First give the total and counts by type, then list every record's title and a one-line summary.
+Only check this project's records for now. Answer in English.
+```
+
+**Expected: 4 records (1 LessonsLearned, 2 Issue, 1 BestPractice).** All 4 titles and summaries are shown. Descriptive labels may vary between answers; check the recorded categories and counts.
+
+```
+Who served as project manager, architect, or tech lead on 陸奥製鋼's "生成AIによる設計レビュー支援"?
+First tell me how many people, then list their names, job titles, and responsibilities on this project.
+Only check this project's people for now. Answer in English.
+```
+
+**Expected: 3 people.** 松本 麻衣 (tech lead), 後藤 陽子 (architect), and 松本 光 (PM).
+
+**Check 東海マテリアル's project**
+
+```
+How many documents were created for 東海マテリアル's "生成AIによる設計レビュー支援"?
+First give the recorded High, Medium, and Low reuse-rating counts, then list High and Medium document names and ratings. For Low, just give the count.
+Only check this project's documents; there is no need to open their contents. Answer in English.
+```
+
+**Expected: 2 documents (1 High, 0 Medium, 1 Low).** The list contains the 1 High document.
+
+```
+How many observations, lessons learned, and successful approaches did the team record for 東海マテリアル's "生成AIによる設計レビュー支援"?
+First give the total and counts by type, then list every record's title and a one-line summary.
+Only check this project's records for now. Answer in English.
+```
+
+**Expected: 5 records (3 LessonsLearned, 1 Issue, 1 BestPractice).** All 5 titles and summaries are shown.
+
+```
+Who served as project manager, architect, or tech lead on 東海マテリアル's "生成AIによる設計レビュー支援"?
+First tell me how many people, then list their names, job titles, and responsibilities on this project.
+Only check this project's people for now. Answer in English.
+```
+
+**Expected: 2 people.** 後藤 陽子 (PM) and 坂本 直樹 (architect).
+
+**Combine the findings**
+
+```
+Using only the answers so far, first summarize project totals by status, document totals by reuse rating, team-record totals by type, and distinct people and total project responsibilities. Do not count the same project or person twice.
+Then list reusable documents, especially useful team observations, and contacts with their project names. Include all High and Medium documents, and each contact's name, job title, and project responsibility.
+Suggest up to five first actions for 大和精密工業's company-wide skills-transfer and design knowledge search proposal.
+Keep projects not yet started separate as "reference." Identify anything not yet checked and leave affected totals unconfirmed. There is no need to search again. Answer in English.
+```
+
+**Expected:**
+
+| Item | Expected answer |
+| --- | --- |
+| Projects | 2 (1 completed, 1 in progress) |
+| Documents | 6 (2 High, 2 Medium, 2 Low), with all 4 High and Medium documents listed as reuse candidates |
+| Team records | 9 (4 LessonsLearned, 3 Issue, 2 BestPractice), with ways to apply useful records |
+| Contacts | 4 distinct people, 5 project responsibilities, and everyone's name, job title, and responsibility |
+| Initial plan | Up to five actions grounded in documents, team records, and contacts |
 
 <u>**Validation points**</u>
 
-- Whether the response follows the `Project` → `Deliverable` / `Knowledge` / `Person` relationships and structures the tacit knowledge of "who should we ask?"
-- Whether each of the four requested items is aggregated appropriately (rather than fixing the search population based on the initial request)
-- Whether upcoming projects are excluded from actual experience
+- Whether documents, team records, and contacts are connected to their respective projects
+- Whether both target projects are included, without counting someone who worked on both twice
 
-#### Follow-up Question (Suggested Contacts)
+**Follow-up question (suggested contacts)**
 
 ```
-For each similar project just listed, provide a list of the people who served as PM, architect, or tech lead.
-Then identify the people whose names appear on two or more projects.
-Also include whether each project is completed or in progress.
-
-When searching the ontology, use Japanese search terms and match the Japanese values stored in OneLake. Provide the final answer in English.
+Using only the answers so far, list the people responsible or serving as technical leads by project, then identify those who worked on two or more projects.
+Include whether each project is completed or in progress. There is no need to search again. Answer in English.
 ```
 
-There is a reason for asking the agent to produce the list first and then narrow it down. If you immediately ask, "Who served as a lead on multiple projects?", the agent may search only among the people named in its preceding answer.
-By first producing a project-based list, you can retrieve the information comprehensively through the ontology.
-
-<u>**Success criteria**</u>
-
-The response identifies _2 people (佐藤 光 and 後藤 陽子)_.
-Both served as leads on completed and in-progress projects. This combination means they can discuss past experience while also retaining a current perspective from active work.
-In some cases, `坂本 直樹` may also be included in the answer. However, his project for 陸奥製鋼 is planned and has not yet started, so this is acceptable if the response notes that it is weaker as evidence of actual experience.
+**Expected: 1 person (後藤 陽子).** She served as architect on 陸奥製鋼's completed project and PM on 東海マテリアル's in-progress project.
 
 ### 3-4. Team Formation (Opportunity-Based)
 
